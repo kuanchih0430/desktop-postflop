@@ -15,7 +15,13 @@
     />
     <button
       class="ml-3 button-base button-blue"
-      :disabled="isTreeBuilding || store.isSolverRunning || store.isFinalizing"
+      :disabled="
+        isTreeBuilding ||
+        store.isSolverRunning ||
+        store.isFinalizing ||
+        store.isResultNavigating ||
+        store.isResultFileBusy
+      "
       @click="buildTree"
     >
       Build New Tree
@@ -314,7 +320,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onMounted, ref, toRef } from "vue";
 import {
   useStore,
   useConfigStore,
@@ -331,6 +337,7 @@ import {
   readableLineString,
 } from "../utils";
 import * as invokes from "../invokes";
+import { confirmResultReplacement } from "../result-files";
 
 import { Tippy } from "vue-tippy";
 import { QuestionMarkCircleIcon } from "@heroicons/vue/20/solid";
@@ -453,13 +460,21 @@ const config = useConfigStore();
 const tmpConfig = useTmpConfigStore();
 const savedConfig = useSavedConfigStore();
 
-const numThreads = ref(navigator.hardwareConcurrency || 1);
-const targetExploitability = ref(0.3);
-const maxIterations = ref(1000);
+const loadedResult = store.resultMetadata;
+const numThreads = ref(
+  loadedResult?.runSettings?.numThreads ??
+    Math.min(navigator.hardwareConcurrency || 1, 64)
+);
+const targetExploitability = ref(
+  loadedResult?.runSettings?.targetExploitability ?? 0.3
+);
+const maxIterations = ref(loadedResult?.runSettings?.maxIterations ?? 1000);
 
-const isTreeBuilding = ref(false);
-const isTreeBuilt = ref(false);
-const treeStatus = ref("Module not loaded");
+const isTreeBuilding = toRef(store, "isTreeBuilding");
+const isTreeBuilt = ref(Boolean(loadedResult));
+const treeStatus = ref(
+  loadedResult ? "Loaded solved result" : "Module not loaded"
+);
 const memoryUsageRaw = ref(0);
 const memoryUsageRawCompressed = ref(0);
 const memoryUsageBunching = ref(0);
@@ -467,16 +482,39 @@ const osName = ref<Awaited<ReturnType<typeof invokes.osName>> | null>(null);
 const maxMemoryUsage = ref(0);
 const availableMemory = ref(0);
 const totalMemory = ref(0);
-const isCompressionEnabled = ref(false);
+const isCompressionEnabled = ref(
+  loadedResult?.solverSetup?.compressionEnabled ?? false
+);
 const solverErrorText = ref("");
 const terminateFlag = ref(false);
 const pauseFlag = ref(false);
-const currentIteration = ref(-1);
-const exploitability = ref(Number.POSITIVE_INFINITY);
-const elapsedTimeMs = ref(-1);
+const currentIteration = ref(loadedResult?.iterations ?? -1);
+const exploitability = ref(
+  loadedResult?.exploitability ?? Number.POSITIVE_INFINITY
+);
+const elapsedTimeMs = ref(loadedResult?.elapsedTimeMs ?? -1);
 
 let startTime = 0;
 let exploitabilityUpdated = false;
+
+onMounted(async () => {
+  if (!loadedResult) return;
+  isTreeBuilding.value = true;
+  try {
+    [memoryUsageRaw.value, memoryUsageRawCompressed.value] =
+      await invokes.gameMemoryUsage();
+    osName.value = await invokes.osName();
+    [availableMemory.value, totalMemory.value] = await invokes.memory();
+    maxMemoryUsage.value =
+      osName.value === "macos"
+        ? totalMemory.value * 0.7
+        : availableMemory.value;
+  } catch (error) {
+    treeStatus.value = `Could not read loaded-tree memory: ${String(error)}`;
+  } finally {
+    isTreeBuilding.value = false;
+  }
+});
 
 const memoryUsage = computed(() => {
   if (store.isBunchingEnabled && store.bunchingFlop.length > 0) {
@@ -544,13 +582,19 @@ const timeText = computed(() => {
 });
 
 const buildTree = async () => {
-  isTreeBuilt.value = false;
-
   const configError = checkConfig(config);
   if (configError !== null) {
     treeStatus.value = `Error: ${configError}`;
     return;
   }
+
+  if (!(await confirmResultReplacement())) return;
+  isTreeBuilt.value = false;
+  store.isSolverFinished = false;
+  store.resultMetadata = null;
+  store.resultFilePath = "";
+  store.isResultDirty = false;
+  store.resultHasBunching = false;
 
   saveConfigTmp();
   isTreeBuilding.value = true;
@@ -628,7 +672,7 @@ const runSolver = async () => {
   pauseFlag.value = false;
   currentIteration.value = -1;
   exploitability.value = Number.POSITIVE_INFINITY;
-  elapsedTimeMs.value = -1;
+  elapsedTimeMs.value = 0;
 
   store.isSolverRunning = true;
 
@@ -705,5 +749,26 @@ const resumeSolver = async () => {
 
   const end = performance.now();
   elapsedTimeMs.value += end - startTime;
+
+  store.resultMetadata = {
+    formatVersion: 1,
+    board: [...savedConfig.board],
+    startingPot: savedConfig.startingPot,
+    effectiveStack: savedConfig.effectiveStack,
+    iterations: currentIteration.value,
+    exploitability: exploitability.value,
+    elapsedTimeMs: Math.max(0, elapsedTimeMs.value),
+    stoppedEarly: terminateFlag.value,
+    runSettings: {
+      numThreads: numThreads.value,
+      targetExploitability: targetExploitability.value,
+      maxIterations: maxIterations.value,
+    },
+  };
+  store.resultHasBunching =
+    memoryUsageBunching.value > 0 &&
+    store.isBunchingEnabled &&
+    store.bunchingFlop.length > 0;
+  store.isResultDirty = true;
 };
 </script>

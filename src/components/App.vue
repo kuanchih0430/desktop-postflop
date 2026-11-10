@@ -1,11 +1,12 @@
 <template>
   <div class="min-w-[1080px]" :style="{ height: clientHeight + 'px' }">
     <NavBar />
+    <ResultFiles />
 
     <div
       v-show="store.navView === 'solver'"
       class="flex w-full mx-auto max-w-screen-xl"
-      style="height: calc(100% - 2.5rem)"
+      style="height: calc(100% - 5.5rem)"
     >
       <SideBar style="height: calc(100% - 2rem)" />
 
@@ -25,22 +26,22 @@
         </div>
 
         <div v-show="store.sideView === 'oop-range'">
-          <RangeEditor :player="0" />
+          <RangeEditor :key="store.resultRevision" :player="0" />
         </div>
         <div v-show="store.sideView === 'ip-range'">
-          <RangeEditor :player="1" />
+          <RangeEditor :key="store.resultRevision" :player="1" />
         </div>
         <div v-show="store.sideView === 'board'">
           <BoardSelector />
         </div>
         <div v-show="store.sideView === 'tree-config'">
-          <TreeConfig />
+          <TreeConfig :key="store.resultRevision" />
         </div>
         <div v-show="store.sideView === 'bunching'">
           <BunchingEffect />
         </div>
         <div v-show="store.sideView === 'run-solver'">
-          <RunSolver />
+          <RunSolver :key="store.resultRevision" />
         </div>
         <div v-if="store.sideView === 'about'">
           <AboutPage />
@@ -50,9 +51,9 @@
 
     <div
       v-show="store.navView === 'results'"
-      style="height: calc(max(100%, 720px) - 2.5rem)"
+      style="height: calc(max(100%, 720px) - 5.5rem)"
     >
-      <ResultViewer />
+      <ResultViewer :key="store.resultRevision" />
     </div>
   </div>
 </template>
@@ -62,6 +63,7 @@ import { computed, ref } from "vue";
 import { useStore } from "../store";
 
 import NavBar from "./NavBar.vue";
+import ResultFiles from "./ResultFiles.vue";
 import SideBar from "./SideBar.vue";
 import RangeEditor from "./RangeEditor.vue";
 import BoardSelector from "./BoardSelector.vue";

@@ -1,0 +1,366 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1695pt" height="933pt" viewBox="0.00 0.00 1695.00 933.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 928.8)">
+<title>DesktopPostflop</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-928.8 1691.49,-928.8 1691.49,4 -4,4"/>
+<text xml:space="preserve" text-anchor="middle" x="843.75" y="-899.2" font-family="sans-serif" font-size="24.00">Desktop Postflop：專案架構</text>
+<g id="clust1" class="cluster">
+<title>cluster_src</title>
+<path fill="#eff6ff" stroke="#93c5fd" d="M20,-363C20,-363 784,-363 784,-363 790,-363 796,-369 796,-375 796,-375 796,-868 796,-868 796,-874 790,-880 784,-880 784,-880 20,-880 20,-880 14,-880 8,-874 8,-868 8,-868 8,-375 8,-375 8,-369 14,-363 20,-363"/>
+<text xml:space="preserve" text-anchor="middle" x="402" y="-854.4" font-family="sans-serif" font-size="24.00">src/：前端介面（Vue 3 + TypeScript）</text>
+</g>
+<g id="clust6" class="cluster">
+<title>cluster_tauri</title>
+<path fill="#fff7ed" stroke="#fdba74" d="M816,-8C816,-8 1529,-8 1529,-8 1535,-8 1541,-14 1541,-20 1541,-20 1541,-483.6 1541,-483.6 1541,-489.6 1535,-495.6 1529,-495.6 1529,-495.6 816,-495.6 816,-495.6 810,-495.6 804,-489.6 804,-483.6 804,-483.6 804,-20 804,-20 804,-14 810,-8 816,-8"/>
+<text xml:space="preserve" text-anchor="middle" x="1172.5" y="-470" font-family="sans-serif" font-size="24.00">src-tauri/：本機端（Tauri + Rust）</text>
+</g>
+<!-- entry -->
+<g id="node1" class="node">
+<title>entry</title>
+<path fill="white" stroke="black" d="M455.5,-835.2C455.5,-835.2 372.5,-835.2 372.5,-835.2 366.5,-835.2 360.5,-829.2 360.5,-823.2 360.5,-823.2 360.5,-810.4 360.5,-810.4 360.5,-804.4 366.5,-798.4 372.5,-798.4 372.5,-798.4 455.5,-798.4 455.5,-798.4 461.5,-798.4 467.5,-804.4 467.5,-810.4 467.5,-810.4 467.5,-823.2 467.5,-823.2 467.5,-829.2 461.5,-835.2 455.5,-835.2"/>
+<text xml:space="preserve" text-anchor="middle" x="414" y="-820.4" font-family="sans-serif" font-size="12.00">main.ts → App.vue</text>
+<text xml:space="preserve" text-anchor="middle" x="414" y="-806" font-family="sans-serif" font-size="12.00">啟動 Vue、組合畫面</text>
+</g>
+<!-- layout -->
+<g id="node2" class="node">
+<title>layout</title>
+<path fill="white" stroke="black" d="M472.98,-710.4C472.98,-710.4 355.02,-710.4 355.02,-710.4 349.02,-710.4 343.02,-704.4 343.02,-698.4 343.02,-698.4 343.02,-685.6 343.02,-685.6 343.02,-679.6 349.02,-673.6 355.02,-673.6 355.02,-673.6 472.98,-673.6 472.98,-673.6 478.98,-673.6 484.98,-679.6 484.98,-685.6 484.98,-685.6 484.98,-698.4 484.98,-698.4 484.98,-704.4 478.98,-710.4 472.98,-710.4"/>
+<text xml:space="preserve" text-anchor="middle" x="414" y="-695.6" font-family="sans-serif" font-size="12.00">NavBar.vue / SideBar.vue</text>
+<text xml:space="preserve" text-anchor="middle" x="414" y="-681.2" font-family="sans-serif" font-size="12.00">切換設定與結果畫面</text>
+</g>
+<!-- entry&#45;&gt;layout -->
+<g id="edge1" class="edge">
+<title>entry-&gt;layout</title>
+<path fill="none" stroke="#64748b" d="M414,-797.94C414,-778.12 414,-745.81 414,-722.27"/>
+<polygon fill="#64748b" stroke="#64748b" points="417.5,-722.39 414,-712.39 410.5,-722.39 417.5,-722.39"/>
+</g>
+<!-- setup -->
+<g id="node3" class="node">
+<title>setup</title>
+<path fill="white" stroke="black" d="M315.32,-617.6C315.32,-617.6 170.68,-617.6 170.68,-617.6 164.68,-617.6 158.68,-611.6 158.68,-605.6 158.68,-605.6 158.68,-549.6 158.68,-549.6 158.68,-543.6 164.68,-537.6 170.68,-537.6 170.68,-537.6 315.32,-537.6 315.32,-537.6 321.32,-537.6 327.32,-543.6 327.32,-549.6 327.32,-549.6 327.32,-605.6 327.32,-605.6 327.32,-611.6 321.32,-617.6 315.32,-617.6"/>
+<text xml:space="preserve" text-anchor="middle" x="243" y="-602.8" font-family="sans-serif" font-size="12.00">設定局面</text>
+<text xml:space="preserve" text-anchor="middle" x="243" y="-588.4" font-family="sans-serif" font-size="12.00">RangeEditor：雙方手牌範圍</text>
+<text xml:space="preserve" text-anchor="middle" x="243" y="-574" font-family="sans-serif" font-size="12.00">BoardSelector：公共牌</text>
+<text xml:space="preserve" text-anchor="middle" x="243" y="-559.6" font-family="sans-serif" font-size="12.00">TreeConfig / TreeEditor：下注樹</text>
+<text xml:space="preserve" text-anchor="middle" x="243" y="-545.2" font-family="sans-serif" font-size="12.00">BunchingEffect：Bunching 設定</text>
+</g>
+<!-- layout&#45;&gt;setup -->
+<g id="edge2" class="edge">
+<title>layout-&gt;setup</title>
+<path fill="none" stroke="#64748b" d="M386.9,-673.19C366.86,-660.01 338.61,-641.44 312.44,-624.24"/>
+<polygon fill="#64748b" stroke="#64748b" points="314.46,-621.38 304.18,-618.81 310.61,-627.23 314.46,-621.38"/>
+<text xml:space="preserve" text-anchor="middle" x="368.81" y="-642.6" font-family="sans-serif" font-size="10.00">切換畫面</text>
+</g>
+<!-- run -->
+<g id="node4" class="node">
+<title>run</title>
+<path fill="white" stroke="black" d="M459.5,-603.2C459.5,-603.2 368.5,-603.2 368.5,-603.2 362.5,-603.2 356.5,-597.2 356.5,-591.2 356.5,-591.2 356.5,-564 356.5,-564 356.5,-558 362.5,-552 368.5,-552 368.5,-552 459.5,-552 459.5,-552 465.5,-552 471.5,-558 471.5,-564 471.5,-564 471.5,-591.2 471.5,-591.2 471.5,-597.2 465.5,-603.2 459.5,-603.2"/>
+<text xml:space="preserve" text-anchor="middle" x="414" y="-588.4" font-family="sans-serif" font-size="12.00">RunSolver.vue</text>
+<text xml:space="preserve" text-anchor="middle" x="414" y="-574" font-family="sans-serif" font-size="12.00">初始化、逐步求解、停止</text>
+<text xml:space="preserve" text-anchor="middle" x="414" y="-559.6" font-family="sans-serif" font-size="12.00">顯示進度與記憶體需求</text>
+</g>
+<!-- layout&#45;&gt;run -->
+<g id="edge3" class="edge">
+<title>layout-&gt;run</title>
+<path fill="none" stroke="#64748b" d="M414,-673.19C414,-657.53 414,-634.26 414,-614.72"/>
+<polygon fill="#64748b" stroke="#64748b" points="417.5,-614.95 414,-604.95 410.5,-614.95 417.5,-614.95"/>
+<text xml:space="preserve" text-anchor="middle" x="429" y="-642.6" font-family="sans-serif" font-size="10.00">切換畫面</text>
+</g>
+<!-- results -->
+<g id="node5" class="node">
+<title>results</title>
+<path fill="white" stroke="black" d="M657.32,-603.2C657.32,-603.2 512.68,-603.2 512.68,-603.2 506.68,-603.2 500.68,-597.2 500.68,-591.2 500.68,-591.2 500.68,-564 500.68,-564 500.68,-558 506.68,-552 512.68,-552 512.68,-552 657.32,-552 657.32,-552 663.32,-552 669.32,-558 669.32,-564 669.32,-564 669.32,-591.2 669.32,-591.2 669.32,-597.2 663.32,-603.2 657.32,-603.2"/>
+<text xml:space="preserve" text-anchor="middle" x="585" y="-588.4" font-family="sans-serif" font-size="12.00">ResultViewer.vue / Result*.vue</text>
+<text xml:space="preserve" text-anchor="middle" x="585" y="-574" font-family="sans-serif" font-size="12.00">瀏覽決策與後續公共牌</text>
+<text xml:space="preserve" text-anchor="middle" x="585" y="-559.6" font-family="sans-serif" font-size="12.00">顯示策略、EV、比較與圖表</text>
+</g>
+<!-- layout&#45;&gt;results -->
+<g id="edge4" class="edge">
+<title>layout-&gt;results</title>
+<path fill="none" stroke="#64748b" d="M441.1,-673.19C466.96,-656.19 506.47,-630.22 537.55,-609.79"/>
+<polygon fill="#64748b" stroke="#64748b" points="539.21,-612.89 545.64,-604.47 535.36,-607.04 539.21,-612.89"/>
+<text xml:space="preserve" text-anchor="middle" x="504.26" y="-642.6" font-family="sans-serif" font-size="10.00">切換畫面</text>
+</g>
+<!-- store -->
+<g id="node6" class="node">
+<title>store</title>
+<path fill="#dbeafe" stroke="black" d="M739.5,-422.2C739.5,-422.2 648.5,-422.2 648.5,-422.2 642.5,-422.2 636.5,-416.2 636.5,-410.2 636.5,-410.2 636.5,-397.4 636.5,-397.4 636.5,-391.4 642.5,-385.4 648.5,-385.4 648.5,-385.4 739.5,-385.4 739.5,-385.4 745.5,-385.4 751.5,-391.4 751.5,-397.4 751.5,-397.4 751.5,-410.2 751.5,-410.2 751.5,-416.2 745.5,-422.2 739.5,-422.2"/>
+<text xml:space="preserve" text-anchor="middle" x="694" y="-407.4" font-family="sans-serif" font-size="12.00">store.ts / Pinia</text>
+<text xml:space="preserve" text-anchor="middle" x="694" y="-393" font-family="sans-serif" font-size="12.00">各畫面共用的狀態與設定</text>
+</g>
+<!-- setup&#45;&gt;store -->
+<g id="edge5" class="edge">
+<title>setup-&gt;store</title>
+<path fill="none" stroke="#64748b" stroke-dasharray="5,2" d="M327.55,-541.47C332.4,-540.03 337.23,-538.72 342,-537.6 396.94,-524.68 544.54,-540.86 595,-515.6 632.02,-497.07 661.53,-458.22 678.4,-431.82"/>
+<polygon fill="#64748b" stroke="#64748b" points="681.16,-434.01 683.44,-423.66 675.21,-430.33 681.16,-434.01"/>
+<text xml:space="preserve" text-anchor="middle" x="627.12" y="-506.6" font-family="sans-serif" font-size="10.00">讀寫狀態</text>
+</g>
+<!-- persistence -->
+<g id="node7" class="node">
+<title>persistence</title>
+<path fill="white" stroke="black" d="M147.83,-436.6C147.83,-436.6 28.17,-436.6 28.17,-436.6 22.17,-436.6 16.17,-430.6 16.17,-424.6 16.17,-424.6 16.17,-383 16.17,-383 16.17,-377 22.17,-371 28.17,-371 28.17,-371 147.83,-371 147.83,-371 153.83,-371 159.83,-377 159.83,-383 159.83,-383 159.83,-424.6 159.83,-424.6 159.83,-430.6 153.83,-436.6 147.83,-436.6"/>
+<text xml:space="preserve" text-anchor="middle" x="88" y="-421.8" font-family="sans-serif" font-size="12.00">DbItemPicker.vue → db.ts</text>
+<text xml:space="preserve" text-anchor="middle" x="88" y="-407.4" font-family="sans-serif" font-size="12.00">Dexie / IndexedDB</text>
+<text xml:space="preserve" text-anchor="middle" x="88" y="-393" font-family="sans-serif" font-size="12.00">保存手牌範圍與下注樹設定</text>
+<text xml:space="preserve" text-anchor="middle" x="88" y="-378.6" font-family="sans-serif" font-size="12.00">舊格式轉換：db-migration.ts</text>
+</g>
+<!-- setup&#45;&gt;persistence -->
+<g id="edge8" class="edge">
+<title>setup-&gt;persistence</title>
+<path fill="none" stroke="#64748b" d="M158.28,-568.94C123.33,-561.12 86.02,-545.7 64.5,-515.6 50.35,-495.81 55.37,-469.26 64.33,-447.11"/>
+<polygon fill="#64748b" stroke="#64748b" points="67.51,-448.58 68.37,-438.02 61.11,-445.74 67.51,-448.58"/>
+<text xml:space="preserve" text-anchor="middle" x="90.75" y="-506.6" font-family="sans-serif" font-size="10.00">保存／載入設定</text>
+</g>
+<!-- support -->
+<g id="node8" class="node">
+<title>support</title>
+<path fill="#f1f5f9" stroke="black" d="M521.5,-429.4C521.5,-429.4 390.5,-429.4 390.5,-429.4 384.5,-429.4 378.5,-423.4 378.5,-417.4 378.5,-417.4 378.5,-390.2 378.5,-390.2 378.5,-384.2 384.5,-378.2 390.5,-378.2 390.5,-378.2 521.5,-378.2 521.5,-378.2 527.5,-378.2 533.5,-384.2 533.5,-390.2 533.5,-390.2 533.5,-417.4 533.5,-417.4 533.5,-423.4 527.5,-429.4 521.5,-429.4"/>
+<text xml:space="preserve" text-anchor="middle" x="456" y="-414.6" font-family="sans-serif" font-size="12.00">utils.ts：共用工具</text>
+<text xml:space="preserve" text-anchor="middle" x="456" y="-400.2" font-family="sans-serif" font-size="12.00">result-types.ts：結果與節點型別</text>
+<text xml:space="preserve" text-anchor="middle" x="456" y="-385.8" font-family="sans-serif" font-size="12.00">style.css / assets/：樣式與資源</text>
+</g>
+<!-- setup&#45;&gt;support -->
+<g id="edge12" class="edge">
+<title>setup-&gt;support</title>
+<path fill="none" stroke="#64748b" stroke-dasharray="1,5" d="M306.02,-537.3C316.24,-530.35 326.56,-522.97 336,-515.6 367.05,-491.35 399.74,-460.79 423.15,-437.9"/>
+<polygon fill="#64748b" stroke="#64748b" points="425.58,-440.42 430.25,-430.91 420.67,-435.43 425.58,-440.42"/>
+<text xml:space="preserve" text-anchor="middle" x="376.05" y="-506.6" font-family="sans-serif" font-size="10.00">使用工具與型別</text>
+</g>
+<!-- invokes -->
+<g id="node9" class="node">
+<title>invokes</title>
+<path fill="#bfdbfe" stroke="black" d="M328.5,-429.4C328.5,-429.4 209.5,-429.4 209.5,-429.4 203.5,-429.4 197.5,-423.4 197.5,-417.4 197.5,-417.4 197.5,-390.2 197.5,-390.2 197.5,-384.2 203.5,-378.2 209.5,-378.2 209.5,-378.2 328.5,-378.2 328.5,-378.2 334.5,-378.2 340.5,-384.2 340.5,-390.2 340.5,-390.2 340.5,-417.4 340.5,-417.4 340.5,-423.4 334.5,-429.4 328.5,-429.4"/>
+<text xml:space="preserve" text-anchor="middle" x="269" y="-414.6" font-family="sans-serif" font-size="12.00">invokes.ts</text>
+<text xml:space="preserve" text-anchor="middle" x="269" y="-400.2" font-family="sans-serif" font-size="12.00">封裝 Tauri invoke 呼叫</text>
+<text xml:space="preserve" text-anchor="middle" x="269" y="-385.8" font-family="sans-serif" font-size="12.00">傳送參數、取得 Rust 回傳資料</text>
+</g>
+<!-- setup&#45;&gt;invokes -->
+<g id="edge9" class="edge">
+<title>setup-&gt;invokes</title>
+<path fill="none" stroke="#64748b" d="M158.24,-551.53C131.92,-539.43 113.61,-523.23 130,-503.6 142.74,-488.34 156.29,-504.63 174,-495.6 200.79,-481.94 225.18,-458.28 242.54,-438.53"/>
+<polygon fill="#64748b" stroke="#64748b" points="245.19,-440.82 249.02,-430.94 239.87,-436.27 245.19,-440.82"/>
+<text xml:space="preserve" text-anchor="middle" x="152.5" y="-506.6" font-family="sans-serif" font-size="10.00">呼叫本機功能</text>
+</g>
+<!-- run&#45;&gt;store -->
+<g id="edge6" class="edge">
+<title>run-&gt;store</title>
+<path fill="none" stroke="#64748b" stroke-dasharray="5,2" d="M453.95,-551.58C464.08,-546.19 475.17,-541.08 486,-537.6 523.32,-525.62 631.1,-540.95 661,-515.6 684.66,-495.54 691.78,-459.33 693.71,-433.77"/>
+<polygon fill="#64748b" stroke="#64748b" points="697.19,-434.21 694.2,-424.05 690.2,-433.86 697.19,-434.21"/>
+<text xml:space="preserve" text-anchor="middle" x="686.45" y="-506.6" font-family="sans-serif" font-size="10.00">讀寫狀態</text>
+</g>
+<!-- run&#45;&gt;support -->
+<g id="edge13" class="edge">
+<title>run-&gt;support</title>
+<path fill="none" stroke="#64748b" stroke-dasharray="1,5" d="M420.11,-551.62C427.23,-522.48 439.06,-474.08 447.18,-440.87"/>
+<polygon fill="#64748b" stroke="#64748b" points="450.55,-441.83 449.53,-431.28 443.75,-440.16 450.55,-441.83"/>
+<text xml:space="preserve" text-anchor="middle" x="457.49" y="-506.6" font-family="sans-serif" font-size="10.00">使用工具與型別</text>
+</g>
+<!-- run&#45;&gt;invokes -->
+<g id="edge10" class="edge">
+<title>run-&gt;invokes</title>
+<path fill="none" stroke="#64748b" d="M373.57,-551.67C363.55,-546.35 352.62,-541.24 342,-537.6 285.32,-518.18 247.75,-561.29 209,-515.6 189,-492.02 209.37,-460.71 231.63,-437.38"/>
+<polygon fill="#64748b" stroke="#64748b" points="233.86,-440.11 238.45,-430.56 228.91,-435.16 233.86,-440.11"/>
+<text xml:space="preserve" text-anchor="middle" x="231.5" y="-506.6" font-family="sans-serif" font-size="10.00">呼叫本機功能</text>
+</g>
+<!-- results&#45;&gt;store -->
+<g id="edge7" class="edge">
+<title>results-&gt;store</title>
+<path fill="none" stroke="#64748b" stroke-dasharray="5,2" d="M669.49,-557.79C691.21,-548.72 712.07,-535.34 725,-515.6 741.66,-490.16 727.54,-455.79 713.36,-432.11"/>
+<polygon fill="#64748b" stroke="#64748b" points="716.49,-430.52 708.18,-423.95 710.58,-434.27 716.49,-430.52"/>
+<text xml:space="preserve" text-anchor="middle" x="745.13" y="-506.6" font-family="sans-serif" font-size="10.00">讀寫狀態</text>
+</g>
+<!-- results&#45;&gt;support -->
+<g id="edge14" class="edge">
+<title>results-&gt;support</title>
+<path fill="none" stroke="#64748b" stroke-dasharray="1,5" d="M566.24,-551.62C543.89,-521.85 506.43,-471.96 481.47,-438.72"/>
+<polygon fill="#64748b" stroke="#64748b" points="484.49,-436.92 475.69,-431.02 478.89,-441.12 484.49,-436.92"/>
+<text xml:space="preserve" text-anchor="middle" x="562.1" y="-506.6" font-family="sans-serif" font-size="10.00">使用工具與型別</text>
+</g>
+<!-- results&#45;&gt;invokes -->
+<g id="edge11" class="edge">
+<title>results-&gt;invokes</title>
+<path fill="none" stroke="#64748b" d="M529.05,-551.56C515.21,-546.21 500.26,-541.12 486,-537.6 442.16,-526.78 316.34,-547.11 284,-515.6 264.64,-496.74 261.9,-465.63 263.43,-441.16"/>
+<polygon fill="#64748b" stroke="#64748b" points="266.91,-441.55 264.33,-431.28 259.94,-440.92 266.91,-441.55"/>
+<text xml:space="preserve" text-anchor="middle" x="306.5" y="-506.6" font-family="sans-serif" font-size="10.00">呼叫本機功能</text>
+</g>
+<!-- main -->
+<g id="node10" class="node">
+<title>main</title>
+<path fill="#fed7aa" stroke="black" d="M1170.17,-288.8C1170.17,-288.8 1041.83,-288.8 1041.83,-288.8 1035.83,-288.8 1029.83,-282.8 1029.83,-276.8 1029.83,-276.8 1029.83,-249.6 1029.83,-249.6 1029.83,-243.6 1035.83,-237.6 1041.83,-237.6 1041.83,-237.6 1170.17,-237.6 1170.17,-237.6 1176.17,-237.6 1182.17,-243.6 1182.17,-249.6 1182.17,-249.6 1182.17,-276.8 1182.17,-276.8 1182.17,-282.8 1176.17,-288.8 1170.17,-288.8"/>
+<text xml:space="preserve" text-anchor="middle" x="1106" y="-274" font-family="sans-serif" font-size="12.00">src/main.rs</text>
+<text xml:space="preserve" text-anchor="middle" x="1106" y="-259.6" font-family="sans-serif" font-size="12.00">啟動 Tauri、註冊指令</text>
+<text xml:space="preserve" text-anchor="middle" x="1106" y="-245.2" font-family="sans-serif" font-size="12.00">管理 Mutex 共用狀態與執行緒池</text>
+</g>
+<!-- invokes&#45;&gt;main -->
+<g id="edge23" class="edge">
+<title>invokes-&gt;main</title>
+<path fill="none" stroke="#2563eb" stroke-width="2" d="M312.74,-377.92C328.45,-369.99 346.6,-361.94 364,-356.8 592.76,-289.14 875.44,-270.9 1016.75,-266"/>
+<polygon fill="#2563eb" stroke="#2563eb" stroke-width="2" points="1016.66,-269.5 1026.54,-265.68 1016.43,-262.51 1016.66,-269.5"/>
+<text xml:space="preserve" text-anchor="middle" x="626.47" y="-325.8" font-family="sans-serif" font-size="10.00">Tauri IPC</text>
+<text xml:space="preserve" text-anchor="middle" x="626.47" y="-313.8" font-family="sans-serif" font-size="10.00">前端呼叫 Rust，結果沿呼叫路徑回傳</text>
+</g>
+<!-- range -->
+<g id="node11" class="node">
+<title>range</title>
+<path fill="white" stroke="black" d="M1369.5,-174.4C1369.5,-174.4 1296.5,-174.4 1296.5,-174.4 1290.5,-174.4 1284.5,-168.4 1284.5,-162.4 1284.5,-162.4 1284.5,-135.2 1284.5,-135.2 1284.5,-129.2 1290.5,-123.2 1296.5,-123.2 1296.5,-123.2 1369.5,-123.2 1369.5,-123.2 1375.5,-123.2 1381.5,-129.2 1381.5,-135.2 1381.5,-135.2 1381.5,-162.4 1381.5,-162.4 1381.5,-168.4 1375.5,-174.4 1369.5,-174.4"/>
+<text xml:space="preserve" text-anchor="middle" x="1333" y="-159.6" font-family="sans-serif" font-size="12.00">src/range.rs</text>
+<text xml:space="preserve" text-anchor="middle" x="1333" y="-145.2" font-family="sans-serif" font-size="12.00">手牌範圍解析與編輯</text>
+<text xml:space="preserve" text-anchor="middle" x="1333" y="-130.8" font-family="sans-serif" font-size="12.00">權重、組合數查詢</text>
+</g>
+<!-- main&#45;&gt;range -->
+<g id="edge15" class="edge">
+<title>main-&gt;range</title>
+<path fill="none" stroke="#64748b" d="M1157.41,-237.11C1189.76,-221.27 1232.37,-200.34 1270,-181.6 1271.3,-180.95 1272.61,-180.3 1273.93,-179.64"/>
+<polygon fill="#64748b" stroke="#64748b" points="1275.46,-182.79 1282.83,-175.18 1272.32,-176.53 1275.46,-182.79"/>
+<text xml:space="preserve" text-anchor="middle" x="1240.03" y="-206.6" font-family="sans-serif" font-size="10.00">指令路由</text>
+</g>
+<!-- tree -->
+<g id="node12" class="node">
+<title>tree</title>
+<path fill="white" stroke="black" d="M1243,-174.4C1243,-174.4 1143,-174.4 1143,-174.4 1137,-174.4 1131,-168.4 1131,-162.4 1131,-162.4 1131,-135.2 1131,-135.2 1131,-129.2 1137,-123.2 1143,-123.2 1143,-123.2 1243,-123.2 1243,-123.2 1249,-123.2 1255,-129.2 1255,-135.2 1255,-135.2 1255,-162.4 1255,-162.4 1255,-168.4 1249,-174.4 1243,-174.4"/>
+<text xml:space="preserve" text-anchor="middle" x="1193" y="-159.6" font-family="sans-serif" font-size="12.00">src/tree.rs</text>
+<text xml:space="preserve" text-anchor="middle" x="1193" y="-145.2" font-family="sans-serif" font-size="12.00">建立與編輯下注樹</text>
+<text xml:space="preserve" text-anchor="middle" x="1193" y="-130.8" font-family="sans-serif" font-size="12.00">新增／移除分支、瀏覽節點</text>
+</g>
+<!-- main&#45;&gt;tree -->
+<g id="edge16" class="edge">
+<title>main-&gt;tree</title>
+<path fill="none" stroke="#64748b" d="M1125.31,-237.25C1137.59,-221.39 1153.63,-200.66 1167.02,-183.36"/>
+<polygon fill="#64748b" stroke="#64748b" points="1169.47,-185.92 1172.82,-175.87 1163.93,-181.64 1169.47,-185.92"/>
+<text xml:space="preserve" text-anchor="middle" x="1164.5" y="-206.6" font-family="sans-serif" font-size="10.00">指令路由</text>
+</g>
+<!-- solver -->
+<g id="node13" class="node">
+<title>solver</title>
+<path fill="white" stroke="black" d="M1090,-181.6C1090,-181.6 950,-181.6 950,-181.6 944,-181.6 938,-175.6 938,-169.6 938,-169.6 938,-128 938,-128 938,-122 944,-116 950,-116 950,-116 1090,-116 1090,-116 1096,-116 1102,-122 1102,-128 1102,-128 1102,-169.6 1102,-169.6 1102,-175.6 1096,-181.6 1090,-181.6"/>
+<text xml:space="preserve" text-anchor="middle" x="1020" y="-166.8" font-family="sans-serif" font-size="12.00">src/solver.rs</text>
+<text xml:space="preserve" text-anchor="middle" x="1020" y="-152.4" font-family="sans-serif" font-size="12.00">初始化牌局、配置記憶體</text>
+<text xml:space="preserve" text-anchor="middle" x="1020" y="-138" font-family="sans-serif" font-size="12.00">執行求解步驟、計算 exploitability</text>
+<text xml:space="preserve" text-anchor="middle" x="1020" y="-123.6" font-family="sans-serif" font-size="12.00">查詢策略與公共牌報告</text>
+</g>
+<!-- main&#45;&gt;solver -->
+<g id="edge17" class="edge">
+<title>main-&gt;solver</title>
+<path fill="none" stroke="#64748b" d="M1086.91,-237.25C1076.49,-223.63 1063.32,-206.41 1051.42,-190.87"/>
+<polygon fill="#64748b" stroke="#64748b" points="1054.37,-188.96 1045.51,-183.15 1048.81,-193.21 1054.37,-188.96"/>
+<text xml:space="preserve" text-anchor="middle" x="1083.15" y="-206.6" font-family="sans-serif" font-size="10.00">指令路由</text>
+</g>
+<!-- bunching -->
+<g id="node14" class="node">
+<title>bunching</title>
+<path fill="white" stroke="black" d="M897.5,-174.4C897.5,-174.4 824.5,-174.4 824.5,-174.4 818.5,-174.4 812.5,-168.4 812.5,-162.4 812.5,-162.4 812.5,-135.2 812.5,-135.2 812.5,-129.2 818.5,-123.2 824.5,-123.2 824.5,-123.2 897.5,-123.2 897.5,-123.2 903.5,-123.2 909.5,-129.2 909.5,-135.2 909.5,-135.2 909.5,-162.4 909.5,-162.4 909.5,-168.4 903.5,-174.4 897.5,-174.4"/>
+<text xml:space="preserve" text-anchor="middle" x="861" y="-159.6" font-family="sans-serif" font-size="12.00">src/bunching.rs</text>
+<text xml:space="preserve" text-anchor="middle" x="861" y="-145.2" font-family="sans-serif" font-size="12.00">初始化、計算與清除</text>
+<text xml:space="preserve" text-anchor="middle" x="861" y="-130.8" font-family="sans-serif" font-size="12.00">Bunching 資料</text>
+</g>
+<!-- main&#45;&gt;bunching -->
+<g id="edge18" class="edge">
+<title>main-&gt;bunching</title>
+<path fill="none" stroke="#64748b" d="M1047.46,-237.17C1011.61,-221.62 964.92,-200.97 924,-181.6 922.69,-180.98 921.37,-180.35 920.04,-179.71"/>
+<polygon fill="#64748b" stroke="#64748b" points="921.6,-176.58 911.08,-175.36 918.54,-182.88 921.6,-176.58"/>
+<text xml:space="preserve" text-anchor="middle" x="1008.63" y="-206.6" font-family="sans-serif" font-size="10.00">指令路由</text>
+</g>
+<!-- system -->
+<g id="node15" class="node">
+<title>system</title>
+<path fill="white" stroke="black" d="M1521.33,-174.4C1521.33,-174.4 1422.67,-174.4 1422.67,-174.4 1416.67,-174.4 1410.67,-168.4 1410.67,-162.4 1410.67,-162.4 1410.67,-135.2 1410.67,-135.2 1410.67,-129.2 1416.67,-123.2 1422.67,-123.2 1422.67,-123.2 1521.33,-123.2 1521.33,-123.2 1527.33,-123.2 1533.33,-129.2 1533.33,-135.2 1533.33,-135.2 1533.33,-162.4 1533.33,-162.4 1533.33,-168.4 1527.33,-174.4 1521.33,-174.4"/>
+<text xml:space="preserve" text-anchor="middle" x="1472" y="-159.6" font-family="sans-serif" font-size="12.00">main.rs 的系統功能</text>
+<text xml:space="preserve" text-anchor="middle" x="1472" y="-145.2" font-family="sans-serif" font-size="12.00">sysinfo：查詢可用記憶體</text>
+<text xml:space="preserve" text-anchor="middle" x="1472" y="-130.8" font-family="sans-serif" font-size="12.00">設定求解使用的執行緒數</text>
+</g>
+<!-- main&#45;&gt;system -->
+<g id="edge19" class="edge">
+<title>main-&gt;system</title>
+<path fill="none" stroke="#64748b" d="M1182.52,-243.72C1241.46,-228.82 1324.66,-206.33 1396,-181.6 1398.51,-180.73 1401.05,-179.82 1403.61,-178.88"/>
+<polygon fill="#64748b" stroke="#64748b" points="1404.67,-182.22 1412.78,-175.4 1402.19,-175.68 1404.67,-182.22"/>
+<text xml:space="preserve" text-anchor="middle" x="1340.3" y="-206.6" font-family="sans-serif" font-size="10.00">指令路由</text>
+</g>
+<!-- engine -->
+<g id="node18" class="node">
+<title>engine</title>
+<path fill="#dcfce7" stroke="#22c55e" stroke-width="2" d="M1675.49,-60C1675.49,-60 1560.51,-60 1560.51,-60 1554.51,-60 1548.51,-54 1548.51,-48 1548.51,-48 1548.51,-20.8 1548.51,-20.8 1548.51,-14.8 1554.51,-8.8 1560.51,-8.8 1560.51,-8.8 1675.49,-8.8 1675.49,-8.8 1681.49,-8.8 1687.49,-14.8 1687.49,-20.8 1687.49,-20.8 1687.49,-48 1687.49,-48 1687.49,-54 1681.49,-60 1675.49,-60"/>
+<text xml:space="preserve" text-anchor="middle" x="1618" y="-45.2" font-family="sans-serif" font-size="12.00">外部依賴：postflop-solver</text>
+<text xml:space="preserve" text-anchor="middle" x="1618" y="-30.8" font-family="sans-serif" font-size="12.00">核心撲克求解引擎</text>
+<text xml:space="preserve" text-anchor="middle" x="1618" y="-16.4" font-family="sans-serif" font-size="12.00">不在此 repository 的 src/ 裡</text>
+</g>
+<!-- range&#45;&gt;engine -->
+<g id="edge24" class="edge">
+<title>range-&gt;engine</title>
+<path fill="none" stroke="#16a34a" d="M1381.22,-122.73C1386.17,-120.37 1391.16,-118.09 1396,-116 1422.06,-104.74 1484.87,-82.08 1537.06,-63.65"/>
+<polygon fill="#16a34a" stroke="#16a34a" points="1537.98,-67.04 1546.25,-60.41 1535.65,-60.43 1537.98,-67.04"/>
+<text xml:space="preserve" text-anchor="middle" x="1507.22" y="-85" font-family="sans-serif" font-size="10.00">使用引擎 API</text>
+</g>
+<!-- tree&#45;&gt;engine -->
+<g id="edge25" class="edge">
+<title>tree-&gt;engine</title>
+<path fill="none" stroke="#16a34a" d="M1251.13,-122.84C1257.45,-120.41 1263.83,-118.08 1270,-116 1325.93,-97.14 1340.58,-93.95 1398.39,-82 1459.26,-69.41 1478.76,-74.76 1536.85,-61.85"/>
+<polygon fill="#16a34a" stroke="#16a34a" points="1537.32,-65.34 1546.27,-59.66 1535.74,-58.52 1537.32,-65.34"/>
+<text xml:space="preserve" text-anchor="middle" x="1422.69" y="-85" font-family="sans-serif" font-size="10.00">使用引擎 API</text>
+</g>
+<!-- pool -->
+<g id="node16" class="node">
+<title>pool</title>
+<path fill="#ffedd5" stroke="black" d="M935.17,-52.8C935.17,-52.8 872.83,-52.8 872.83,-52.8 866.83,-52.8 860.83,-46.8 860.83,-40.8 860.83,-40.8 860.83,-28 860.83,-28 860.83,-22 866.83,-16 872.83,-16 872.83,-16 935.17,-16 935.17,-16 941.17,-16 947.17,-22 947.17,-28 947.17,-28 947.17,-40.8 947.17,-40.8 947.17,-46.8 941.17,-52.8 935.17,-52.8"/>
+<text xml:space="preserve" text-anchor="middle" x="904" y="-38" font-family="sans-serif" font-size="12.00">Rayon 執行緒池</text>
+<text xml:space="preserve" text-anchor="middle" x="904" y="-23.6" font-family="sans-serif" font-size="12.00">執行平行運算</text>
+</g>
+<!-- solver&#45;&gt;pool -->
+<g id="edge20" class="edge">
+<title>solver-&gt;pool</title>
+<path fill="none" stroke="#64748b" d="M986.76,-115.59C968.97,-98.36 947.36,-77.41 930.68,-61.25"/>
+<polygon fill="#64748b" stroke="#64748b" points="933.16,-58.78 923.54,-54.34 928.29,-63.81 933.16,-58.78"/>
+<text xml:space="preserve" text-anchor="middle" x="984.5" y="-85" font-family="sans-serif" font-size="10.00">使用執行緒池</text>
+</g>
+<!-- solver&#45;&gt;engine -->
+<g id="edge26" class="edge">
+<title>solver-&gt;engine</title>
+<path fill="none" stroke="#16a34a" d="M1102.35,-120.05C1107.29,-118.62 1112.2,-117.26 1117,-116 1192.12,-96.31 1211.5,-92.89 1288.39,-82 1397.96,-66.48 1430.77,-82.22 1536.59,-61.65"/>
+<polygon fill="#16a34a" stroke="#16a34a" points="1537.17,-65.11 1546.28,-59.7 1535.78,-58.25 1537.17,-65.11"/>
+<text xml:space="preserve" text-anchor="middle" x="1312.69" y="-85" font-family="sans-serif" font-size="10.00">使用引擎 API</text>
+</g>
+<!-- bunching&#45;&gt;pool -->
+<g id="edge21" class="edge">
+<title>bunching-&gt;pool</title>
+<path fill="none" stroke="#64748b" d="M870.54,-122.85C877.22,-105.39 886.16,-82.03 893.12,-63.85"/>
+<polygon fill="#64748b" stroke="#64748b" points="896.31,-65.3 896.61,-54.71 889.77,-62.79 896.31,-65.3"/>
+<text xml:space="preserve" text-anchor="middle" x="907.57" y="-85" font-family="sans-serif" font-size="10.00">使用執行緒池</text>
+</g>
+<!-- bunching&#45;&gt;engine -->
+<g id="edge27" class="edge">
+<title>bunching-&gt;engine</title>
+<path fill="none" stroke="#16a34a" d="M906.38,-122.75C912.2,-120.18 918.16,-117.84 924,-116 1024.38,-84.31 1053.66,-92.56 1158.39,-82 1325.95,-65.11 1373.97,-91.48 1536.87,-61.5"/>
+<polygon fill="#16a34a" stroke="#16a34a" points="1537.11,-65.02 1546.28,-59.72 1535.81,-58.14 1537.11,-65.02"/>
+<text xml:space="preserve" text-anchor="middle" x="1182.69" y="-85" font-family="sans-serif" font-size="10.00">使用引擎 API</text>
+</g>
+<!-- config -->
+<g id="node17" class="node">
+<title>config</title>
+<path fill="#f1f5f9" stroke="black" d="M1160.32,-450.8C1160.32,-450.8 1051.68,-450.8 1051.68,-450.8 1045.68,-450.8 1039.68,-444.8 1039.68,-438.8 1039.68,-438.8 1039.68,-368.8 1039.68,-368.8 1039.68,-362.8 1045.68,-356.8 1051.68,-356.8 1051.68,-356.8 1160.32,-356.8 1160.32,-356.8 1166.32,-356.8 1172.32,-362.8 1172.32,-368.8 1172.32,-368.8 1172.32,-438.8 1172.32,-438.8 1172.32,-444.8 1166.32,-450.8 1160.32,-450.8"/>
+<text xml:space="preserve" text-anchor="middle" x="1106" y="-436" font-family="sans-serif" font-size="12.00">tauri.conf.json</text>
+<text xml:space="preserve" text-anchor="middle" x="1106" y="-421.6" font-family="sans-serif" font-size="12.00">視窗、前端啟動與建置指令</text>
+<text xml:space="preserve" text-anchor="middle" x="1106" y="-407.2" font-family="sans-serif" font-size="12.00">檔案權限、打包設定</text>
+<text xml:space="preserve" text-anchor="middle" x="1106" y="-378.8" font-family="sans-serif" font-size="12.00">Cargo.toml / Cargo.lock</text>
+<text xml:space="preserve" text-anchor="middle" x="1106" y="-364.4" font-family="sans-serif" font-size="12.00">Rust 依賴、版本與編譯設定</text>
+</g>
+<!-- config&#45;&gt;main -->
+<g id="edge22" class="edge">
+<title>config-&gt;main</title>
+<path fill="none" stroke="#64748b" stroke-dasharray="5,2" d="M1106,-356.65C1106,-338.35 1106,-317.62 1106,-300.43"/>
+<polygon fill="#64748b" stroke="#64748b" points="1109.5,-300.69 1106,-290.69 1102.5,-300.69 1109.5,-300.69"/>
+<text xml:space="preserve" text-anchor="middle" x="1132.25" y="-319.8" font-family="sans-serif" font-size="10.00">建置與應用設定</text>
+</g>
+<!-- note -->
+<g id="node19" class="node">
+<title>note</title>
+<polygon fill="#fef9c3" stroke="#eab308" points="969.99,-878.2 804.01,-878.2 804.01,-755.4 975.99,-755.4 975.99,-872.2 969.99,-878.2"/>
+<polyline fill="none" stroke="#eab308" points="969.99,-878.2 969.99,-872.2"/>
+<polyline fill="none" stroke="#eab308" points="975.99,-872.2 969.99,-872.2"/>
+<text xml:space="preserve" text-anchor="middle" x="890" y="-863.4" font-family="sans-serif" font-size="12.00">閱讀順序</text>
+<text xml:space="preserve" text-anchor="middle" x="890" y="-849" font-family="sans-serif" font-size="12.00">1. App.vue：有哪些畫面</text>
+<text xml:space="preserve" text-anchor="middle" x="890" y="-834.6" font-family="sans-serif" font-size="12.00">2. RangeEditor.vue：操作如何觸發</text>
+<text xml:space="preserve" text-anchor="middle" x="890" y="-820.2" font-family="sans-serif" font-size="12.00">3. invokes.ts：呼叫哪個指令</text>
+<text xml:space="preserve" text-anchor="middle" x="890" y="-805.8" font-family="sans-serif" font-size="12.00">4. main.rs：指令如何註冊</text>
+<text xml:space="preserve" text-anchor="middle" x="890" y="-791.4" font-family="sans-serif" font-size="12.00">5. range.rs / solver.rs：實際處理</text>
+<text xml:space="preserve" text-anchor="middle" x="890" y="-763" font-family="sans-serif" font-size="12.00">前端與 Rust 都在同一台電腦執行</text>
+</g>
+</g>
+</svg>

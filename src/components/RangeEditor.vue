@@ -135,7 +135,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useStore } from "../store";
 import { ranks, trimRegex, rangeRegex } from "../utils";
 import * as invokes from "../invokes";
@@ -270,4 +270,6 @@ const loadRange = (rangeStr: unknown) => {
   rangeText.value = String(rangeStr);
   onRangeTextChange();
 };
+
+onMounted(onUpdate);
 </script>

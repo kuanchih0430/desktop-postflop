@@ -5,10 +5,12 @@
 
 mod bunching;
 mod range;
+mod result_file;
 mod solver;
 mod tree;
 use crate::bunching::*;
 use crate::range::*;
+use crate::result_file::*;
 use crate::solver::*;
 use crate::tree::*;
 
@@ -63,6 +65,8 @@ fn main() {
             game_solve_step,
             game_exploitability,
             game_finalize,
+            game_save_result,
+            game_load_result,
             game_apply_history,
             game_total_bet_amount,
             game_actions_after,

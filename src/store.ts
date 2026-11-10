@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { sanitizeBetString } from "./utils";
+import { ResultMetadata } from "./result-file-types";
 
 export type NavView = "solver" | "results";
 
@@ -104,6 +105,14 @@ export const useStore = defineStore("app", {
     isSolverFinished: false,
     isSolverError: false,
     isFinalizing: false,
+    isTreeBuilding: false,
+    isResultFileBusy: false,
+    isResultNavigating: false,
+    resultRevision: 0,
+    resultFilePath: "",
+    resultMetadata: null as ResultMetadata | null,
+    isResultDirty: false,
+    resultHasBunching: false,
   }),
 
   getters: {

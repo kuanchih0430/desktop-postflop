@@ -68,7 +68,11 @@ pub fn range_get_weights(
     range_state: tauri::State<Mutex<RangeManager>>,
     player: usize,
 ) -> Vec<f32> {
-    let range = &(range_state.lock().unwrap().0)[player];
+    let ranges = range_state.lock().unwrap();
+    range_weights(&ranges.0[player])
+}
+
+pub fn range_weights(range: &Range) -> Vec<f32> {
     let mut weights = vec![0.0; 13 * 13];
 
     for row in 0..13 {

@@ -135,9 +135,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { useStore } from "../store";
 import * as invokes from "../invokes";
+import { fileError } from "../result-files";
 
 import {
   Results,
@@ -164,6 +165,9 @@ const store = useStore();
 
 const isHandlerUpdated = ref(false);
 const isLocked = ref(false);
+watch(isLocked, (locked) => (store.isResultNavigating = locked), {
+  flush: "sync",
+});
 
 const cards = ref<number[][]>([[], []]);
 const dealtCard = ref(-1);
@@ -175,20 +179,16 @@ const results = ref<Results | null>(null);
 const chanceReports = ref<ChanceReports | null>(null);
 const totalBetAmount = ref([0, 0]);
 
-const isSolverFinished = ref(false);
-store.$subscribe(async (_, store) => {
-  if (isSolverFinished.value !== store.isSolverFinished) {
-    if ((isSolverFinished.value = store.isSolverFinished)) {
-      await init();
-    } else {
-      clear();
-    }
-  }
-});
-
 const init = async () => {
-  cards.value = await invokes.gamePrivateCards();
-  isHandlerUpdated.value = true;
+  store.isResultNavigating = true;
+  try {
+    cards.value = await invokes.gamePrivateCards();
+    await nextTick();
+    isHandlerUpdated.value = true;
+  } catch (error) {
+    store.isResultNavigating = false;
+    fileError.value = `Could not initialize result viewer: ${String(error)}`;
+  }
 };
 
 const clear = () => {
@@ -198,6 +198,15 @@ const clear = () => {
   results.value = null;
   chanceReports.value = null;
 };
+
+watch(
+  () => store.isSolverFinished,
+  async (finished) => {
+    if (finished) await init();
+    else clear();
+  },
+  { immediate: true }
+);
 
 const onUpdateSpot = (
   newSelectedSpot: Spot | null,

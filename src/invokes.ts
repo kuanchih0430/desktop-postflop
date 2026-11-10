@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 import { Results, ChanceReports } from "./result-types";
+import { ResultMetadata, RunStats } from "./result-file-types";
 
 export const osName = async (): Promise<"windows" | "macos" | "linux"> => {
   return await invoke("os_name");
@@ -267,6 +268,17 @@ export const gameExploitability = async (): Promise<number> => {
 
 export const gameFinalize = async () => {
   await invoke("game_finalize");
+};
+
+export const gameSaveResult = async (
+  path: string,
+  stats: RunStats
+): Promise<ResultMetadata> => {
+  return await invoke("game_save_result", { path, stats });
+};
+
+export const gameLoadResult = async (path: string): Promise<ResultMetadata> => {
+  return await invoke("game_load_result", { path });
 };
 
 export const gameApplyHistory = async (history: number[]) => {

@@ -65,6 +65,22 @@ You can download the app from the [GitHub releases page].
 
 [WebView2 runtime]: https://developer.microsoft.com/en-us/microsoft-edge/webview2/#download-section
 
+## Saving solved results
+
+Use **Save Result** after solving (or stopping and finalizing) to save a complete
+decision tree as a `.dpfresult` file. Use **Open Result** to review it without
+solving again. Unsaved results prompt before replacement. Bunching results and
+resuming a solve from a saved result are not supported.
+
+New result files use lossless zstd compression. Existing uncompressed result files
+can still be opened; open and save them again to produce a compressed file.
+
+Opening a result also restores the Solver ranges, board, betting configuration,
+edited branches, and precision mode. New files preserve thread count, target
+exploitability, and maximum iterations; older files use defaults for those options.
+
+See [Result file workflow and validation](doc/result-files.md) for details.
+
 ## Uninstall
 
 On Windows, please remove the following folder after the regular uninstallation to completely uninstall Desktop Postflop:
@@ -98,8 +114,8 @@ If you want to use stable Rust instead of nightly Rust, please modify the follow
 ```diff
 [dependencies]
 ...
-- postflop-solver = { git = "https://github.com/b-inary/postflop-solver", features = ["custom-alloc"] }
-+ postflop-solver = { git = "https://github.com/b-inary/postflop-solver" }
+- postflop-solver = { git = "https://github.com/b-inary/postflop-solver", features = ["custom-alloc", "zstd"] }
++ postflop-solver = { git = "https://github.com/b-inary/postflop-solver", features = ["zstd"] }
 ```
 
 [Rust]: https://www.rust-lang.org/learn/get-started

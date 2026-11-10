@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useConfigStore } from "../store";
 import { cardText, parseCardString } from "../utils";
 import BoardSelectorCard from "./BoardSelectorCard.vue";
@@ -102,4 +102,9 @@ const generateRandomBoard = () => {
   config.board.sort((a, b) => b - a);
   setBoardTextFromButtons();
 };
+
+watch(() => config.board, setBoardTextFromButtons, {
+  deep: true,
+  immediate: true,
+});
 </script>

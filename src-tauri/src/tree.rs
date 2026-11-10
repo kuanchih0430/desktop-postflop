@@ -27,7 +27,7 @@ fn encode_action(action: Action) -> String {
     }
 }
 
-fn encode_line(line: &[Action]) -> String {
+pub(crate) fn encode_line(line: &[Action]) -> String {
     let mut flag = 0;
     let mut encoded = String::new();
 
