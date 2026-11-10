@@ -204,4 +204,31 @@ mod tests {
         fs::write(folder.0.join("range.txt"), "AA").unwrap();
         assert_eq!(read_folder(&folder.0).unwrap().len(), 2);
     }
+
+    #[test]
+    #[ignore = "requires a local range library path"]
+    fn audit_local_txt_library() {
+        let source = std::env::var("DPF_AUDIT_RANGE_FOLDER").expect("Set DPF_AUDIT_RANGE_FOLDER");
+        let entries = read_folder(Path::new(&source)).unwrap();
+        let ranges: Vec<_> = entries.iter().filter(|entry| !entry.is_group).collect();
+        for entry in &ranges {
+            let original =
+                Path::new(&source).join(entry.path[1..].iter().collect::<std::path::PathBuf>());
+            let original_range: Range = fs::read_to_string(original).unwrap().parse().unwrap();
+            let imported_range: Range = entry.value.as_ref().unwrap().parse().unwrap();
+            assert_eq!(
+                original_range.raw_data(),
+                imported_range.raw_data(),
+                "{}",
+                entry.path.join("/")
+            );
+        }
+        let output = std::env::var("DPF_AUDIT_OUTPUT").expect("Set DPF_AUDIT_OUTPUT");
+        fs::write(output, serde_json::to_vec(&entries).unwrap()).unwrap();
+        println!(
+            "AUDIT: {} ranges, {} groups",
+            ranges.len(),
+            entries.len() - ranges.len()
+        );
+    }
 }

@@ -335,3 +335,106 @@ test("recursive picker renders groups and range rows beyond the old four-level l
   assert.ok(html.includes("(Empty group)"));
   assert.equal((html.match(/>LJ_raise\.txt</g) ?? []).length, 2);
 });
+
+test("reimport repairs existing empty groups without duplicating or overwriting ranges", async () => {
+  const root = ["Repair library"];
+  const call = [...root, "BTN", "2.5bb", "BB", "Call"];
+  const entries = root.map((_, i) => ({ path: root.slice(0, i + 1), isGroup: true }));
+  for (let depth = root.length + 1; depth <= call.length; depth++) entries.push({ path: call.slice(0, depth), isGroup: true });
+  entries.push({ path: [...call, "BTN_range.txt"], isGroup: false, value: source });
+  entries.push({ path: [...call, "BB_range.txt"], isGroup: false, value: "KK:0.25" });
+  entries.push({ path: [...call, "Empty.txt"], isGroup: false, value: "" });
+  assert.equal(await Db.bulkAdd("ranges", [
+    ...entries.filter((entry) => entry.isGroup).map((entry) => record(entry.path, 1)),
+    record([...call, "Empty.txt"], 0, ""),
+    record([...call, "Custom.txt"], 0, "QQ:0.5"),
+  ]), true);
+  const planned = planFolderImport(entries, [], await Db.getArray("ranges"), true);
+  assert.deepEqual(planned.root, root);
+  assert.equal(planned.items.length, 2);
+  assert.equal(planned.ranges.length, 3);
+  assert.equal(await Db.bulkAdd("ranges", planned.items), true);
+  const saved = (await Db.getArray("ranges")).filter((entry) => Db.withinPath(entry.path, root));
+  const group = buildTree(saved)[0].items[0].items[0].items[0].items[0];
+  assert.equal(group.items.length, 4);
+  assert.ok(group.items.some((entry) => entry.value === source));
+  assert.ok(group.items.some((entry) => entry.value === "QQ:0.5"));
+  const repeat = planFolderImport(entries, [], await Db.getArray("ranges"), true);
+  assert.equal(repeat.items.length, 0);
+  const conflict = planFolderImport([{ path: root, isGroup: true },
+    ...call.slice(1).map((_, i) => ({ path: call.slice(0, i + 2), isGroup: true })),
+    { path: [...call, "Custom.txt"], isGroup: false, value: "AA" },
+  ], [], await Db.getArray("ranges"), true);
+  assert.deepEqual(conflict.ranges[0].path, [...call, "Custom (2).txt"]);
+});
+
+// Optional full-library audit. Generate the input with the ignored Rust audit
+// first; user range data remains outside the repository and the live database.
+test(
+  "every .txt in a local library survives database storage and tree construction",
+  {
+    skip: !process.env.DPF_AUDIT_OUTPUT,
+  },
+  async () => {
+    const entries = JSON.parse(
+      fs.readFileSync(process.env.DPF_AUDIT_OUTPUT, "utf8")
+    );
+    const planned = planFolderImport(entries, [], await Db.getArray("ranges"));
+    assert.equal(await Db.bulkAdd("ranges", planned.items), true);
+    const persisted = (await Db.getArray("ranges")).filter((entry) =>
+      Db.withinPath(entry.path, planned.root)
+    );
+    const tree = buildTree(persisted);
+    const leaves = [];
+    const walk = (items) =>
+      items.forEach((item) =>
+        item.isGroup ? walk(item.items) : leaves.push(item)
+      );
+    walk(tree);
+    const expected = entries.filter((entry) => !entry.isGroup);
+    assert.equal(leaves.length, expected.length);
+    for (const source of expected) {
+      const key = JSON.stringify([...planned.root, ...source.path.slice(1)]);
+      const leaf = leaves.find((item) => item.pathStr === key);
+      assert.ok(leaf, `Missing .txt: ${source.path.join("/")}`);
+      assert.equal(leaf.value, source.value);
+    }
+    const call = persisted.filter(
+      (entry) =>
+        entry.isGroup === 0 &&
+        JSON.stringify(entry.path.slice(0, -1)) ===
+          JSON.stringify([...planned.root, "BTN", "2.5bb", "BB", "Call"])
+    );
+    assert.deepEqual(call.map((entry) => entry.path.at(-1)).sort(), [
+      "BB_range.txt",
+      "BTN_range.txt",
+    ]);
+    console.log(
+      `LOCAL AUDIT: ${leaves.length} .txt files retained in database and tree`
+    );
+  }
+);
+
+test("repairs the actual saved library containing all groups but only empty ranges", {
+  skip: !process.env.DPF_AUDIT_OUTPUT || !process.env.DPF_AUDIT_SAVED_RECORDS,
+}, async () => {
+  const entries = JSON.parse(fs.readFileSync(process.env.DPF_AUDIT_OUTPUT, "utf8"));
+  const snapshot = JSON.parse(fs.readFileSync(process.env.DPF_AUDIT_SAVED_RECORDS, "utf8"));
+  await Db.deleteItem("ranges", record([entries[0].path[0]], 1));
+  assert.equal(await Db.bulkAdd("ranges", snapshot), true);
+  const planned = planFolderImport(entries, [], await Db.getArray("ranges"), true);
+  assert.deepEqual(planned.root, entries[0].path);
+  assert.equal(planned.ranges.length, 1480);
+  assert.equal(planned.items.length, 1445);
+  assert.equal(await Db.bulkAdd("ranges", planned.items), true);
+  const saved = (await Db.getArray("ranges")).filter((entry) => Db.withinPath(entry.path, planned.root));
+  assert.equal(saved.filter((entry) => entry.isGroup === 1).length, 1255);
+  assert.equal(saved.filter((entry) => entry.isGroup === 0).length, 1480);
+  for (const expected of planned.ranges) {
+    assert.equal(saved.find((entry) => entry.pathKey === expected.pathKey)?.value, expected.value);
+  }
+  const callKey = JSON.stringify([...planned.root, "BTN", "2.5bb", "BB", "Call"]);
+  const callFiles = saved.filter((entry) => entry.isGroup === 0 && JSON.stringify(entry.path.slice(0,-1)) === callKey);
+  assert.deepEqual(callFiles.map((entry) => entry.path.at(-1)).sort(), ["BB_range.txt", "BTN_range.txt"]);
+  console.log("REPAIR AUDIT: 1,445 missing files restored, all 1,480 .txt files verified");
+});

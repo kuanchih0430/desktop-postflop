@@ -710,10 +710,20 @@ const importFolder = async () => {
     }
     importStatus.value = "Reading and validating range files…";
     const entries = await rangeImportFolder(path);
-    const { root, items } = planFolderImport(
+    const count = entries.filter((entry) => !entry.isGroup).length;
+    if (count === 0)
+      throw new Error("No .txt range files were found. Nothing was imported.");
+    // Reimporting the same source folder repairs its existing tree, even when
+    // one of that tree's descendants is currently selected.
+    const sourceName = entries[0].path[0];
+    const ancestor = selected?.path.indexOf(sourceName) ?? -1;
+    const importParent =
+      ancestor >= 0 ? selected!.path.slice(0, ancestor) : parent;
+    const { root, items, ranges } = planFolderImport(
       entries,
-      parent,
-      await Db.getArray(props.storeName)
+      importParent,
+      await Db.getArray(props.storeName),
+      true
     );
     importStatus.value = "Saving ranges…";
     if (!(await Db.bulkAdd(props.storeName, items)))
@@ -722,18 +732,51 @@ const importFolder = async () => {
       );
     channel.postMessage({ type: "importJson" });
     await loadData();
+    const saved = new Map(
+      (await Db.getArray(props.storeName)).map((entry) => [
+        entry.pathKey,
+        entry,
+      ])
+    );
+    if (
+      ranges.some((range) => {
+        const stored = saved.get(range.pathKey);
+        return !stored || stored.isGroup !== 0 || stored.value !== range.value;
+      })
+    )
+      throw new Error(
+        "The imported .txt files could not all be verified. Please import the folder again."
+      );
+    // Reveal a real range immediately, including all ancestors of that file.
+    // Otherwise the user sees only folder names after a successful import.
+    const firstRange = ranges.reduce<Db.DbItem | null>(
+      (best, item) =>
+        item.isGroup === 0 && (!best || item.path.length < best.path.length)
+          ? item
+          : best,
+      null
+    );
+    const revealPath = firstRange?.path ?? root;
     let siblings = data.value;
-    for (let depth = 0; depth < root.length; depth++) {
-      const group = siblings.find((item) => item.path[depth] === root[depth]);
+    for (let depth = 0; depth < revealPath.length; depth++) {
+      const group = siblings.find(
+        (item) => item.path[depth] === revealPath[depth]
+      );
       if (!group?.isGroup) break;
       group.opened = true;
       siblings = group.items;
     }
-    selectedValue.value = JSON.stringify(root);
-    const count = entries.filter((entry) => !entry.isGroup).length;
+    selectedValue.value = firstRange?.pathKey ?? JSON.stringify(root);
     importStatus.value = `Imported ${count} range${
       count === 1 ? "" : "s"
     } into "${root[root.length - 1]}".`;
+    await nextTick();
+    document
+      .querySelector(
+        `input[name="item-picker-${props.storeName}-${props.index}"]:checked`
+      )
+      ?.closest("label")
+      ?.scrollIntoView({ block: "nearest", inline: "nearest" });
   } catch (error) {
     importError.value = String(error);
     importStatus.value = "";
