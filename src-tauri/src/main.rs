@@ -5,6 +5,7 @@
 
 mod bunching;
 mod range;
+mod range_folder;
 mod result_file;
 mod solver;
 mod tree;
@@ -38,6 +39,7 @@ fn main() {
             range_to_string,
             range_get_weights,
             range_raw_data,
+            range_folder::range_import_folder,
             tree_new,
             tree_added_lines,
             tree_removed_lines,

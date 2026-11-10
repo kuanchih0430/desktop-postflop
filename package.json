@@ -9,6 +9,7 @@
     "build": "vue-tsc && vite build",
     "tauri": "tauri",
     "test:result-files": "node --test tests/result-files.test.cjs",
+    "test:range-folders": "node --test tests/range-folders.test.cjs",
     "lint": "eslint src/**/*.{ts,vue}",
     "format": "prettier --write src/**/*.{ts,vue}"
   },
@@ -33,6 +34,7 @@
     "autoprefixer": "^10.4.16",
     "eslint": "^8.50.0",
     "eslint-plugin-vue": "^9.17.0",
+    "fake-indexeddb": "^6.2.4",
     "postcss": "^8.4.31",
     "prettier": "^3.0.3",
     "tailwindcss": "^3.3.3",

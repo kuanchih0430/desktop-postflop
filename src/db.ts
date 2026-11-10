@@ -3,29 +3,48 @@ import { ConfigValue1, migrateConfig1to2 } from "./db-migration";
 
 export type DbItem = {
   id?: number;
-  name0: string;
-  name1: string;
-  name2: string;
-  name3: string;
+  path: string[];
+  pathKey: string;
   isGroup: 0;
   value: unknown;
 };
 
 export type DbGroup = {
   id?: number;
+  path: string[];
+  pathKey: string;
+  isGroup: 1;
+};
+
+type LegacyEntry = {
   name0: string;
   name1: string;
   name2: string;
   name3: string;
-  isGroup: 1;
+  isGroup: 0 | 1;
+  value?: unknown;
 };
 
-class DesktopPostflopDB extends Dexie {
+export const legacyPath = (item: LegacyEntry): string[] => {
+  const names = [item.name0, item.name1, item.name2, item.name3];
+  const end = names.indexOf("");
+  return end < 0 ? names : names.slice(0, end);
+};
+
+export const validPath = (path: unknown): path is string[] =>
+  Array.isArray(path) &&
+  path.length > 0 &&
+  path.every((name) => typeof name === "string" && name.trim() !== "");
+
+export const withinPath = (path: string[], parent: string[]): boolean =>
+  path.length >= parent.length && parent.every((name, i) => path[i] === name);
+
+export class DesktopPostflopDB extends Dexie {
   public ranges!: Table<DbItem | DbGroup, number>;
   public configurations!: Table<DbItem | DbGroup, number>;
 
-  public constructor() {
-    super("DesktopPostflopDB");
+  public constructor(name = "DesktopPostflopDB") {
+    super(name);
 
     this.version(1).stores({
       ranges: "++id, [name0+name1+name2+name3+isGroup]",
@@ -41,74 +60,73 @@ class DesktopPostflopDB extends Dexie {
         return tx
           .table("configurations")
           .toCollection()
-          .modify((item: DbItem | DbGroup) => {
+          .modify((item: LegacyEntry) => {
             if (!item.isGroup) {
               item.value = migrateConfig1to2(item.value as ConfigValue1);
             }
           });
+      });
+
+    // Preserve existing ranges/configurations while removing the four-level limit.
+    this.version(3)
+      .stores({
+        ranges: "++id, &pathKey, isGroup",
+        configurations: "++id, &pathKey, isGroup",
+      })
+      .upgrade(async (tx) => {
+        for (const store of ["ranges", "configurations"]) {
+          await tx
+            .table(store)
+            .toCollection()
+            .modify((item) => {
+              item.path = legacyPath(item);
+              item.pathKey = JSON.stringify(item.path);
+              delete item.name0;
+              delete item.name1;
+              delete item.name2;
+              delete item.name3;
+            });
+        }
       });
   }
 }
 
 const db = new DesktopPostflopDB();
 
-const makeParent = (item: DbItem | DbGroup) => {
-  if (item.name3 !== "") {
-    return { ...item, name3: "", isGroup: 1 };
-  } else if (item.name2 !== "") {
-    return { ...item, name2: "", isGroup: 1 };
-  } else if (item.name1 !== "") {
-    return { ...item, name1: "", isGroup: 1 };
-  } else {
-    throw new Error("Cannot make parent of top-level item");
-  }
-};
-
-const makeRenamed = (item: DbItem | DbGroup, newName: string) => {
-  if (item.name3 !== "") {
-    return { ...item, name3: newName };
-  } else if (item.name2 !== "") {
-    return { ...item, name2: newName };
-  } else if (item.name1 !== "") {
-    return { ...item, name1: newName };
-  } else {
-    return { ...item, name0: newName };
-  }
-};
-
 export const getArray = async (store: string) => {
   return (await db.table(store).toArray()) as (DbItem | DbGroup)[];
 };
 
-export const addItem = async (store: string, item: DbItem) => {
+// Validate the entire batch before writing. A failed import leaves the library intact.
+export const bulkAdd = async (store: string, items: (DbItem | DbGroup)[]) => {
   try {
     const table = db.table(store);
-
     return await db.transaction("rw", table, async () => {
-      // duplicate check
-      const count = await table
-        .where("[name0+name1+name2+name3]")
-        .equals([item.name0, item.name1, item.name2, item.name3])
-        .count();
-      if (count > 0) {
-        return false;
+      const existing = new Map<string, DbItem | DbGroup>(
+        (await table.toArray()).map((item) => [item.pathKey, item])
+      );
+      const normalized = items.map((item) => {
+        const entry = {
+          ...item,
+          path: [...item.path],
+          pathKey: JSON.stringify(item.path),
+        };
+        delete entry.id;
+        return entry;
+      });
+      for (const item of normalized) {
+        if (!validPath(item.path) || existing.has(item.pathKey)) return false;
+        existing.set(item.pathKey, item);
       }
-
-      // parent check
-      if (item.name1 !== "") {
-        const parent = makeParent(item);
-        const count = await table
-          .where("[name0+name1+name2+name3+isGroup]")
-          .equals([parent.name0, parent.name1, parent.name2, parent.name3, 1])
-          .count();
-        if (count !== 1) {
+      for (const item of normalized) {
+        if (
+          item.path.length > 1 &&
+          existing.get(JSON.stringify(item.path.slice(0, -1)))?.isGroup !== 1
+        ) {
           return false;
         }
       }
-
-      // insert
-      await table.add(item);
-
+      await table.bulkAdd(normalized);
       return true;
     });
   } catch {
@@ -116,23 +134,21 @@ export const addItem = async (store: string, item: DbItem) => {
   }
 };
 
+export const addItem = (store: string, item: DbItem) => bulkAdd(store, [item]);
+export const addGroup = (store: string, item: DbGroup) =>
+  bulkAdd(store, [item]);
+
 export const overwriteItem = async (store: string, item: DbItem) => {
   try {
     const table = db.table(store);
-
     return await db.transaction("rw", table, async () => {
-      // get collection
-      const collection = table
-        .where("[name0+name1+name2+name3+isGroup]")
-        .equals([item.name0, item.name1, item.name2, item.name3, 0]);
-
-      // check if exists
-      if ((await collection.count()) !== 1) {
-        return false;
-      }
-
-      // update
-      return (await collection.modify({ value: item.value })) === 1;
+      const current = await table
+        .where("pathKey")
+        .equals(JSON.stringify(item.path))
+        .first();
+      if (!current || current.isGroup !== 0) return false;
+      await table.update(current.id, { value: item.value });
+      return true;
     });
   } catch {
     return false;
@@ -144,79 +160,32 @@ export const renameItem = async (
   item: DbItem | DbGroup,
   newName: string
 ) => {
+  if (!validPath(item.path) || newName.trim() === "") return false;
   try {
     const table = db.table(store);
-
     return await db.transaction("rw", table, async () => {
-      const renamed = makeRenamed(item, newName);
-
-      // duplicate check
-      const count = await table
-        .where("[name0+name1+name2+name3]")
-        .equals([renamed.name0, renamed.name1, renamed.name2, renamed.name3])
-        .count();
-      if (count > 0) {
-        return false;
-      }
-
-      const [index, key, modifier] =
-        item.name3 !== ""
-          ? [
-              "[name0+name1+name2+name3]",
-              [item.name0, item.name1, item.name2, item.name3],
-              { name3: newName },
-            ]
-          : item.name2 !== ""
-          ? [
-              "[name0+name1+name2]",
-              [item.name0, item.name1, item.name2],
-              { name2: newName },
-            ]
-          : item.name1 !== ""
-          ? ["[name0+name1]", [item.name0, item.name1], { name1: newName }]
-          : ["name0", item.name0, { name0: newName }];
-
-      // update
-      return (await table.where(index).equals(key).modify(modifier)) > 0;
-    });
-  } catch {
-    return false;
-  }
-};
-
-export const addGroup = async (store: string, group: DbGroup) => {
-  if (group.name3 !== "") {
-    return false;
-  }
-
-  try {
-    const table = db.table(store);
-
-    return await db.transaction("rw", table, async () => {
-      // duplicate check
-      const count = await table
-        .where("[name0+name1+name2+name3]")
-        .equals([group.name0, group.name1, group.name2, group.name3])
-        .count();
-      if (count > 0) {
-        return false;
-      }
-
-      // parent check
-      if (group.name1 !== "") {
-        const parent = makeParent(group);
-        const count = await table
-          .where("[name0+name1+name2+name3+isGroup]")
-          .equals([parent.name0, parent.name1, parent.name2, parent.name3, 1])
-          .count();
-        if (count !== 1) {
-          return false;
-        }
-      }
-
-      // insert
-      await table.add(group);
-
+      const current = await table
+        .where("pathKey")
+        .equals(JSON.stringify(item.path))
+        .first();
+      if (!current || current.isGroup !== item.isGroup) return false;
+      const newPath = [...item.path.slice(0, -1), newName];
+      const key = JSON.stringify(newPath);
+      if (key === current.pathKey) return true;
+      if (await table.where("pathKey").equals(key).count()) return false;
+      const entries: (DbItem | DbGroup)[] = await table
+        .filter((entry) =>
+          item.isGroup
+            ? withinPath(entry.path, item.path)
+            : entry.pathKey === current.pathKey
+        )
+        .toArray();
+      await table.bulkPut(
+        entries.map((entry) => {
+          const path = [...newPath, ...entry.path.slice(item.path.length)];
+          return { ...entry, path, pathKey: JSON.stringify(path) };
+        })
+      );
       return true;
     });
   } catch {
@@ -227,55 +196,17 @@ export const addGroup = async (store: string, group: DbGroup) => {
 export const deleteItem = async (store: string, item: DbItem | DbGroup) => {
   try {
     const table = db.table(store);
-
     return await db.transaction("rw", table, async () => {
-      if (item.isGroup) {
-        // check if exists
-        const count = await table
-          .where("[name0+name1+name2+name3+isGroup]")
-          .equals([item.name0, item.name1, item.name2, item.name3, 1])
-          .count();
-        if (count !== 1) {
-          return false;
-        }
-
-        const [index, key] =
-          item.name2 !== ""
-            ? ["[name0+name1+name2]", [item.name0, item.name1, item.name2]]
-            : item.name1 !== ""
-            ? ["[name0+name1]", [item.name0, item.name1]]
-            : ["name0", item.name0];
-
-        // delete
-        return (await table.where(index).equals(key).delete()) > 0;
-      } else {
-        // get collection
-        const collection = table
-          .where("[name0+name1+name2+name3+isGroup]")
-          .equals([item.name0, item.name1, item.name2, item.name3, 0]);
-
-        // check if exists
-        if ((await collection.count()) !== 1) {
-          return false;
-        }
-
-        // delete
-        return (await collection.delete()) === 1;
-      }
-    });
-  } catch {
-    return false;
-  }
-};
-
-export const bulkAdd = async (store: string, items: (DbItem | DbGroup)[]) => {
-  try {
-    const table = db.table(store);
-
-    return await db.transaction("rw", table, async () => {
-      // insert
-      await table.bulkAdd(items);
-
+      const key = JSON.stringify(item.path);
+      const current = await table.where("pathKey").equals(key).first();
+      if (!current || current.isGroup !== item.isGroup) return false;
+      await table
+        .filter((entry) =>
+          item.isGroup
+            ? withinPath(entry.path, item.path)
+            : entry.pathKey === key
+        )
+        .delete();
       return true;
     });
   } catch {

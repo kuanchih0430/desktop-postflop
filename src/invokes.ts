@@ -1,6 +1,13 @@
 import { invoke } from "@tauri-apps/api";
 import { Results, ChanceReports } from "./result-types";
 import { ResultMetadata, RunStats } from "./result-file-types";
+import type { FolderEntry } from "./range-folder-import";
+
+export const rangeImportFolder = async (
+  path: string
+): Promise<FolderEntry[]> => {
+  return await invoke("range_import_folder", { path });
+};
 
 export const osName = async (): Promise<"windows" | "macos" | "linux"> => {
   return await invoke("os_name");

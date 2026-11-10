@@ -2,381 +2,37 @@
   <div
     class="w-full h-[22.5rem] px-1 border border-gray-500 rounded-md shadow text-sm overflow-x-auto overflow-y-scroll select-none"
     @click="unselect"
-    @keydown.f2="renameItem()"
-    @keydown.delete="deleteItem(true)"
+    @keydown.f2="!isImporting && renameItem()"
+    @keydown.delete="!isImporting && deleteItem(true)"
   >
     <!-- No saved items -->
-    <div v-if="data.length === 0" class="item-toplevel">
+    <div v-if="data.length === 0" class="pl-5">
       <span class="inline-block px-1">(No saved {{ storeName }})</span>
     </div>
 
-    <!-- Depth 0 -->
-    <div
-      v-for="item0 in data"
-      :key="item0.pathStr"
-      :class="{ 'item-toplevel': !item0.isGroup }"
-    >
-      <template v-if="item0.isGroup">
-        <!-- Open/Close button -->
-        <button
-          :class="item0.opened ? 'bottom-arrow' : 'right-arrow'"
-          @click="toggleGroup(item0)"
-        >
-          &nbsp;
-        </button>
-
-        <!-- Name edit -->
-        <input
-          v-if="item0.isEditing"
-          ref="nameInput"
-          v-model="editingName"
-          type="text"
-          :class="'px-1 py-0 text-sm ' + (!isNameValid ? 'input-error' : '')"
-          style="width: calc(100% - 1.25rem)"
-          @blur="tryRename(item0)"
-          @keydown.enter="tryRename(item0)"
-          @keydown.escape="cancelRename(item0)"
-          @keydown.delete.stop
-        />
-
-        <!-- Group name -->
-        <label
-          v-else
-          class="inline-block"
-          @dblclick="toggleGroup(item0)"
-          @keydown.enter="toggleGroup(item0)"
-        >
-          <input
-            v-model="selectedValue"
-            type="radio"
-            :name="`item-picker-${storeName}-${index}`"
-            class="sr-only peer"
-            :value="item0.pathStr"
-          />
-          <span
-            class="inline-block px-1 rounded-sm whitespace-nowrap peer-checked:bg-blue-600 peer-checked:text-white"
-          >
-            {{ item0.path[0] }}
-          </span>
-        </label>
-
-        <!-- Group items -->
-        <div
-          v-if="item0.opened"
-          class="group"
-          :style="{ '--guide-decrease': guideDecrease(item0) }"
-        >
-          <!-- Empty group -->
-          <div v-if="item0.items.length === 0" class="item-inside">
-            <span class="inline-block px-1">(Empty group)</span>
-          </div>
-
-          <!-- Depth 1 -->
-          <div
-            v-for="item1 in item0.items"
-            :key="item1.pathStr"
-            :class="item1.isGroup ? 'group-inside' : 'item-inside'"
-          >
-            <template v-if="item1.isGroup">
-              <!-- Open/Close button -->
-              <button
-                :class="item1.opened ? 'bottom-arrow' : 'right-arrow'"
-                @click="toggleGroup(item1)"
-              >
-                &nbsp;
-              </button>
-
-              <!-- Name edit -->
-              <input
-                v-if="item1.isEditing"
-                ref="nameInput"
-                v-model="editingName"
-                type="text"
-                :class="
-                  'px-1 py-0 text-sm ' + (!isNameValid ? 'input-error' : '')
-                "
-                style="width: calc(100% - 1.25rem)"
-                @blur="tryRename(item1)"
-                @keydown.enter="tryRename(item1)"
-                @keydown.escape="cancelRename(item1)"
-                @keydown.delete.stop
-              />
-
-              <!-- Group name -->
-              <label
-                v-else
-                class="inline-block"
-                @dblclick="toggleGroup(item1)"
-                @keydown.enter="toggleGroup(item1)"
-              >
-                <input
-                  v-model="selectedValue"
-                  type="radio"
-                  :name="`item-picker-${storeName}-${index}`"
-                  class="sr-only peer"
-                  :value="item1.pathStr"
-                />
-                <span
-                  class="inline-block px-1 rounded-sm whitespace-nowrap peer-checked:bg-blue-600 peer-checked:text-white"
-                >
-                  {{ item1.path[1] }}
-                </span>
-              </label>
-
-              <!-- Group items -->
-              <div
-                v-if="item1.opened"
-                class="group"
-                :style="{
-                  '--guide-decrease': guideDecrease(item1),
-                }"
-              >
-                <!-- Empty group -->
-                <div v-if="item1.items.length === 0" class="item-inside">
-                  <span class="inline-block px-1">(Empty group)</span>
-                </div>
-
-                <!-- Depth 2 -->
-                <div
-                  v-for="item2 in item1.items"
-                  :key="item2.pathStr"
-                  :class="item2.isGroup ? 'group-inside' : 'item-inside'"
-                >
-                  <template v-if="item2.isGroup">
-                    <!-- Open/Close button -->
-                    <button
-                      :class="item2.opened ? 'bottom-arrow' : 'right-arrow'"
-                      @click="toggleGroup(item2)"
-                    >
-                      &nbsp;
-                    </button>
-
-                    <!-- Name edit -->
-                    <input
-                      v-if="item2.isEditing"
-                      ref="nameInput"
-                      v-model="editingName"
-                      type="text"
-                      :class="
-                        'px-1 py-0 text-sm ' +
-                        (!isNameValid ? 'input-error' : '')
-                      "
-                      style="width: calc(100% - 1.25rem)"
-                      @blur="tryRename(item2)"
-                      @keydown.enter="tryRename(item2)"
-                      @keydown.escape="cancelRename(item2)"
-                      @keydown.delete.stop
-                    />
-
-                    <!-- Group name -->
-                    <label
-                      v-else
-                      class="inline-block"
-                      @dblclick="toggleGroup(item2)"
-                      @keydown.enter="toggleGroup(item2)"
-                    >
-                      <input
-                        v-model="selectedValue"
-                        type="radio"
-                        :name="`item-picker-${storeName}-${index}`"
-                        class="sr-only peer"
-                        :value="item2.pathStr"
-                      />
-                      <span
-                        class="inline-block px-1 rounded-sm whitespace-nowrap peer-checked:bg-blue-600 peer-checked:text-white"
-                      >
-                        {{ item2.path[2] }}
-                      </span>
-                    </label>
-
-                    <!-- Group items -->
-                    <div
-                      v-if="item2.opened"
-                      class="group"
-                      :style="{
-                        '--guide-decrease': guideDecrease(item2),
-                      }"
-                    >
-                      <!-- Empty group -->
-                      <div v-if="item2.items.length === 0" class="item-inside">
-                        <span class="inline-block px-1">(Empty group)</span>
-                      </div>
-
-                      <!-- Depth 3 -->
-                      <div
-                        v-for="item3 in item2.items"
-                        :key="item3.pathStr"
-                        class="item-inside"
-                      >
-                        <!-- Name edit -->
-                        <input
-                          v-if="item3.isEditing"
-                          ref="nameInput"
-                          v-model="editingName"
-                          type="text"
-                          :class="
-                            'px-1 py-0 w-full text-sm ' +
-                            (!isNameValid ? 'input-error' : '')
-                          "
-                          @blur="tryRename(item3)"
-                          @keydown.enter="tryRename(item3)"
-                          @keydown.escape="cancelRename(item3)"
-                          @keydown.delete.stop
-                        />
-
-                        <!-- Item name -->
-                        <label
-                          v-else
-                          class="inline-block"
-                          @dblclick="loadItem()"
-                          @keydown.enter="loadItem()"
-                        >
-                          <input
-                            v-model="selectedValue"
-                            type="radio"
-                            :name="`item-picker-${storeName}-${index}`"
-                            class="sr-only peer"
-                            :value="item3.pathStr"
-                          />
-                          <span
-                            class="inline-block px-1 rounded-sm whitespace-nowrap peer-checked:bg-blue-600 peer-checked:text-white"
-                          >
-                            {{ item3.path[3] }}
-                          </span>
-                        </label>
-                      </div>
-                    </div>
-                  </template>
-
-                  <template v-else>
-                    <!-- Name edit -->
-                    <input
-                      v-if="item2.isEditing"
-                      ref="nameInput"
-                      v-model="editingName"
-                      type="text"
-                      :class="
-                        'px-1 py-0 w-full text-sm ' +
-                        (!isNameValid ? 'input-error' : '')
-                      "
-                      @blur="tryRename(item2)"
-                      @keydown.enter="tryRename(item2)"
-                      @keydown.escape="cancelRename(item2)"
-                      @keydown.delete.stop
-                    />
-
-                    <!-- Item name -->
-                    <label
-                      v-else
-                      class="inline-block"
-                      @dblclick="loadItem()"
-                      @keydown.enter="loadItem()"
-                    >
-                      <input
-                        v-model="selectedValue"
-                        type="radio"
-                        :name="`item-picker-${storeName}-${index}`"
-                        class="sr-only peer"
-                        :value="item2.pathStr"
-                      />
-                      <span
-                        class="inline-block px-1 rounded-sm whitespace-nowrap peer-checked:bg-blue-600 peer-checked:text-white"
-                      >
-                        {{ item2.path[2] }}
-                      </span>
-                    </label>
-                  </template>
-                </div>
-              </div>
-            </template>
-
-            <template v-else>
-              <!-- Name edit -->
-              <input
-                v-if="item1.isEditing"
-                ref="nameInput"
-                v-model="editingName"
-                type="text"
-                :class="
-                  'px-1 py-0 w-full text-sm ' +
-                  (!isNameValid ? 'input-error' : '')
-                "
-                @blur="tryRename(item1)"
-                @keydown.enter="tryRename(item1)"
-                @keydown.escape="cancelRename(item1)"
-                @keydown.delete.stop
-              />
-
-              <!-- Item name -->
-              <label
-                v-else
-                class="inline-block"
-                @dblclick="loadItem()"
-                @keydown.enter="loadItem()"
-              >
-                <input
-                  v-model="selectedValue"
-                  type="radio"
-                  :name="`item-picker-${storeName}-${index}`"
-                  class="sr-only peer"
-                  :value="item1.pathStr"
-                />
-                <span
-                  class="inline-block px-1 rounded-sm whitespace-nowrap peer-checked:bg-blue-600 peer-checked:text-white"
-                >
-                  {{ item1.path[1] }}
-                </span>
-              </label>
-            </template>
-          </div>
-        </div>
-      </template>
-
-      <template v-else>
-        <!-- Name edit -->
-        <input
-          v-if="item0.isEditing"
-          ref="nameInput"
-          v-model="editingName"
-          type="text"
-          :class="
-            'px-1 py-0 w-full text-sm ' + (!isNameValid ? 'input-error' : '')
-          "
-          @blur="tryRename(item0)"
-          @keydown.enter="tryRename(item0)"
-          @keydown.escape="cancelRename(item0)"
-          @keydown.delete.stop
-        />
-
-        <!-- Item name -->
-        <label
-          v-else
-          class="inline-block"
-          @dblclick="loadItem()"
-          @keydown.enter="loadItem()"
-        >
-          <input
-            v-model="selectedValue"
-            type="radio"
-            :name="`item-picker-${storeName}-${index}`"
-            class="sr-only peer"
-            :value="item0.pathStr"
-          />
-          <span
-            class="inline-block px-1 rounded-sm whitespace-nowrap peer-checked:bg-blue-600 peer-checked:text-white"
-          >
-            {{ item0.path[0] }}
-          </span>
-        </label>
-      </template>
-    </div>
+    <DbPickerNode
+      v-for="item in data"
+      :key="item.pathStr"
+      :item="item"
+      :root="true"
+      :radio-name="`item-picker-${storeName}-${index}`"
+      :selected-value="selectedValue"
+      :editing-name="editingName"
+      :is-name-valid="isNameValid"
+      @select="selectedValue = $event"
+      @toggle="toggleGroup"
+      @activate="activateItem"
+      @update-editing-name="editingName = $event"
+      @rename="tryRename"
+      @cancel-rename="cancelRename"
+    />
   </div>
 
   <div v-if="errorOccured" class="mt-3 text-red-500 font-semibold">
     Something went wrong. Please relaunch the app.
   </div>
 
-  <div class="flex flex-col mt-4 gap-3">
+  <fieldset class="flex flex-col mt-4 gap-3" :disabled="isImporting">
     <div class="grid grid-cols-3 w-full gap-3">
       <button
         class="button-base button-blue button-overrides"
@@ -406,13 +62,7 @@
     <div class="grid grid-cols-2 w-full gap-3">
       <button
         class="button-base button-blue button-overrides"
-        :disabled="
-          errorOccured ||
-          (selectedItem !== null &&
-            selectedItem.item.path.length +
-              (selectedItem.item.isGroup ? 1 : 0) >=
-              4)
-        "
+        :disabled="errorOccured || isImporting"
         @click="addGroup()"
       >
         Add Group
@@ -444,7 +94,23 @@
         Export JSON
       </button>
     </div>
-  </div>
+    <button
+      v-if="storeName === 'ranges' && !hideImportExport"
+      class="button-base button-green button-overrides"
+      :disabled="errorOccured || isEditing"
+      @click="importFolder"
+    >
+      {{ isImporting ? "Importing folder…" : "Import Folder" }}
+    </button>
+    <p
+      v-if="importStatus"
+      class="text-sm text-gray-600"
+      role="status"
+      aria-live="polite"
+    >
+      {{ importStatus }}
+    </p>
+  </fieldset>
 
   <div
     v-if="importError !== ''"
@@ -464,30 +130,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref } from "vue";
+import { computed, nextTick, onUnmounted, ref } from "vue";
+import DbPickerNode from "./DbPickerNode.vue";
+import { buildTree, type Item, type Group } from "../db-tree";
+import { rangeImportFolder } from "../invokes";
+import { planFolderImport } from "../range-folder-import";
 import * as Db from "../db";
 
 import { open, save } from "@tauri-apps/api/dialog";
 import { readTextFile, writeTextFile } from "@tauri-apps/api/fs";
 
 import { XMarkIcon } from "@heroicons/vue/20/solid";
-
-type Item = {
-  isGroup: false;
-  path: string[];
-  pathStr: string;
-  value: unknown;
-  isEditing: boolean;
-};
-
-type Group = {
-  isGroup: true;
-  path: string[];
-  pathStr: string;
-  opened: boolean;
-  isEditing: boolean;
-  items: (Item | Group)[];
-};
 
 const isEqual = (lhs: unknown, rhs: unknown) => {
   if (lhs === null || typeof lhs !== "object") return lhs === rhs;
@@ -518,18 +171,14 @@ const clone = (value: unknown) => {
 };
 
 const groupToDbGroup = (group: Group): Db.DbGroup => ({
-  name0: group.path[0],
-  name1: group.path[1] ?? "",
-  name2: group.path[2] ?? "",
-  name3: group.path[3] ?? "",
+  path: [...group.path],
+  pathKey: group.pathStr,
   isGroup: 1,
 });
 
 const itemToDbItem = (item: Item): Db.DbItem => ({
-  name0: item.path[0],
-  name1: item.path[1] ?? "",
-  name2: item.path[2] ?? "",
-  name3: item.path[3] ?? "",
+  path: [...item.path],
+  pathKey: item.pathStr,
   isGroup: 0,
   value: clone(item.value),
 });
@@ -616,87 +265,21 @@ const errorOccured = ref(false);
 const loadData = async () => {
   const masterData = await Db.getArray(props.storeName);
 
-  masterData.sort(
-    (a, b) =>
-      Number(b.name1 === "") - Number(a.name1 === "") ||
-      Number(b.name2 === "") - Number(a.name2 === "") ||
-      Number(b.name3 === "") - Number(a.name3 === "") ||
-      b.isGroup - a.isGroup ||
-      a.name0.localeCompare(b.name0, undefined, { numeric: true }) ||
-      a.name1.localeCompare(b.name1, undefined, { numeric: true }) ||
-      a.name2.localeCompare(b.name2, undefined, { numeric: true }) ||
-      a.name3.localeCompare(b.name3, undefined, { numeric: true })
-  );
-
-  data.value = [];
-  selectedValue.value = false;
-
-  const dataMap = new Map<string, Item | Group>();
-  const dataItems = new Map<string, (Item | Group)[]>();
-  dataItems.set(JSON.stringify([]), data.value);
-
-  for (const masterItem of masterData) {
-    if (masterItem.isGroup) {
-      const path = [masterItem.name0, masterItem.name1, masterItem.name2, ""];
-      const depth = path.findIndex((name) => name === "");
-      path.length = depth;
-      const pathStr = JSON.stringify(path);
-      const parent = path.slice(0, -1);
-      const parentStr = JSON.stringify(parent);
-      const parentItems = dataItems.get(parentStr);
-      if (parentItems) {
-        const items: (Item | Group)[] = [];
-        const group: Group = {
-          isGroup: true,
-          path,
-          pathStr,
-          opened: depth === 1,
-          isEditing: false,
-          items,
-        };
-        parentItems.push(group);
-        dataMap.set(pathStr, group);
-        dataItems.set(pathStr, items);
-      } else {
-        errorOccured.value = true;
-        return;
-      }
-    } else {
-      const path = [
-        masterItem.name0,
-        masterItem.name1,
-        masterItem.name2,
-        masterItem.name3,
-        "",
-      ];
-      const depth = path.findIndex((name) => name === "");
-      path.splice(depth);
-      const pathStr = JSON.stringify(path);
-      const parent = path.slice(0, -1);
-      const parentStr = JSON.stringify(parent);
-      const parentItems = dataItems.get(parentStr);
-      if (parentItems) {
-        const item: Item = {
-          isGroup: false,
-          path,
-          pathStr,
-          value: masterItem.value,
-          isEditing: false,
-        };
-        parentItems.push(item);
-        dataMap.set(pathStr, item);
-      } else {
-        errorOccured.value = true;
-        return;
-      }
-    }
+  try {
+    data.value = buildTree(masterData);
+    selectedValue.value = false;
+  } catch {
+    errorOccured.value = true;
   }
 };
 
-loadData();
+loadData().catch(() => {
+  errorOccured.value = true;
+});
 
 // Broadcast channel
 const channel = new BroadcastChannel(`item-picker-${props.storeName}`);
+onUnmounted(() => channel.close());
 
 channel.onmessage = async (event: MessageEvent<Message>) => {
   if (errorOccured.value) return;
@@ -770,7 +353,6 @@ channel.onmessage = async (event: MessageEvent<Message>) => {
 const isEditing = ref(false);
 const editingName = ref("");
 const duplicateName = ref([] as string[]);
-const nameInput = ref(null as HTMLInputElement[] | null);
 
 const unselect = (ev: MouseEvent) => {
   const target = ev.target as HTMLElement;
@@ -797,33 +379,20 @@ const toggleGroup = (group: Group) => {
   }
 };
 
-const numDisplayedRows = (group: Group) => {
-  if (!group.opened) return 0;
-  let ret = group.items.length || 1;
-  for (const child of group.items) {
-    if (child.isGroup) {
-      ret += numDisplayedRows(child);
-    }
-  }
-  return ret;
-};
-
-const guideDecrease = (group: Group) => {
-  if (group.items.length > 0) {
-    const lastChild = group.items[group.items.length - 1];
-    if (lastChild.isGroup) {
-      return numDisplayedRows(lastChild);
-    }
-  }
-  return 0;
-};
-
 const loadItem = () => {
   if (!selectedItem.value) return;
   if (selectedItem.value.item.isGroup === false) {
     emit("load-item", selectedItem.value.item.value);
   }
   selectedValue.value = false;
+};
+
+const activateItem = (item: Item | Group) => {
+  if (item.isGroup) toggleGroup(item);
+  else {
+    selectedValue.value = item.pathStr;
+    loadItem();
+  }
 };
 
 const addOrOverwriteItem = async (value?: unknown, name?: string) => {
@@ -911,10 +480,6 @@ const renameItem = async () => {
   }
   selectedValue.value = false;
   await nextTick();
-  if (nameInput.value) {
-    nameInput.value[0].select();
-    nameInput.value[0].scrollIntoView({ block: "nearest" });
-  }
 };
 
 const tryRename = async (item: Item | Group, newName?: string) => {
@@ -1062,7 +627,6 @@ const addGroup = async (name?: string) => {
       ? [...selectedItem.value.item.path, name ?? ""]
       : [...selectedItem.value.item.path.slice(0, -1), name ?? ""]
     : [name ?? ""];
-  if (path.length > 3) return;
   const pathStr = JSON.stringify(path);
   const parentItems = selectedItem.value
     ? selectedItem.value.item.isGroup
@@ -1120,6 +684,63 @@ const deleteItem = async (isUserAction: boolean) => {
 };
 
 const importError = ref("");
+const importStatus = ref("");
+const isImporting = ref(false);
+
+const importFolder = async () => {
+  if (errorOccured.value || isEditing.value || isImporting.value) return;
+  const selected = selectedItem.value?.item;
+  const parent = selected
+    ? selected.isGroup
+      ? [...selected.path]
+      : selected.path.slice(0, -1)
+    : [];
+  isImporting.value = true;
+  importError.value = "";
+  importStatus.value = "Choose a folder of .txt ranges…";
+  try {
+    const path = await open({
+      title: "Import range folder",
+      directory: true,
+      multiple: false,
+    });
+    if (typeof path !== "string") {
+      importStatus.value = "";
+      return;
+    }
+    importStatus.value = "Reading and validating range files…";
+    const entries = await rangeImportFolder(path);
+    const { root, items } = planFolderImport(
+      entries,
+      parent,
+      await Db.getArray(props.storeName)
+    );
+    importStatus.value = "Saving ranges…";
+    if (!(await Db.bulkAdd(props.storeName, items)))
+      throw new Error(
+        "Could not save the imported folder. No ranges were imported."
+      );
+    channel.postMessage({ type: "importJson" });
+    await loadData();
+    let siblings = data.value;
+    for (let depth = 0; depth < root.length; depth++) {
+      const group = siblings.find((item) => item.path[depth] === root[depth]);
+      if (!group?.isGroup) break;
+      group.opened = true;
+      siblings = group.items;
+    }
+    selectedValue.value = JSON.stringify(root);
+    const count = entries.filter((entry) => !entry.isGroup).length;
+    importStatus.value = `Imported ${count} range${
+      count === 1 ? "" : "s"
+    } into "${root[root.length - 1]}".`;
+  } catch (error) {
+    importError.value = String(error);
+    importStatus.value = "";
+  } finally {
+    isImporting.value = false;
+  }
+};
 
 type JsonItem = {
   path: string[];
@@ -1140,10 +761,12 @@ const checkJson = (array: JsonItem[]) => {
 
   for (const item of array) {
     if (
+      !item ||
+      typeof item !== "object" ||
       typeof item.isGroup !== "boolean" ||
       !Array.isArray(item.path) ||
       item.path.some((x) => typeof x !== "string") ||
-      item.path.length > (item.isGroup ? 3 : 4) ||
+      item.path.length === 0 ||
       (!item.isGroup && typeof item.value !== valueType)
     ) {
       return false;
@@ -1169,9 +792,7 @@ const getItemsToAdd = async (array: JsonItem[]) => {
   const masterData = await Db.getArray(props.storeName);
   const masterMap = new Map<string, Db.DbItem | Db.DbGroup>();
   for (const item of masterData) {
-    const path = [item.name0, item.name1, item.name2, item.name3, ""];
-    path.length = path.findIndex((x) => x === "");
-    masterMap.set(JSON.stringify(path), item);
+    masterMap.set(item.pathKey, item);
   }
 
   const ret: (Db.DbItem | Db.DbGroup)[] = [];
@@ -1186,10 +807,8 @@ const getItemsToAdd = async (array: JsonItem[]) => {
       if (master && master.isGroup === 0) return name;
       if (!master) {
         ret.push({
-          name0: item.path[0],
-          name1: item.path[1] ?? "",
-          name2: item.path[2] ?? "",
-          name3: item.path[3] ?? "",
+          path: [...item.path],
+          pathKey: pathStr,
           isGroup: 1,
         });
       }
@@ -1206,15 +825,15 @@ const getItemsToAdd = async (array: JsonItem[]) => {
       }
       if (!master) {
         ret.push({
-          name0: item.path[0],
-          name1: item.path[1] ?? "",
-          name2: item.path[2] ?? "",
-          name3: item.path[3] ?? "",
+          path: [...item.path],
+          pathKey: pathStr,
           isGroup: 0,
           value: item.value,
         });
       }
     }
+    const added = ret[ret.length - 1];
+    if (added) masterMap.set(added.pathKey, added);
   }
 
   return ret;
@@ -1242,7 +861,7 @@ const importJson = async () => {
     return;
   }
 
-  if (obj.version !== 2) {
+  if (!obj || (obj.version !== 2 && obj.version !== 3)) {
     importError.value = "Version mismatch";
     return;
   }
@@ -1289,7 +908,12 @@ const exportJson = async () => {
     appendRecursive(item, array);
   }
 
-  const obj = { version: 2, name: props.storeName, data: array };
+  const version = array.some(
+    (item) => item.path.length > (item.isGroup ? 3 : 4)
+  )
+    ? 3
+    : 2;
+  const obj = { version, name: props.storeName, data: array };
   const jsonStr = JSON.stringify(obj, undefined, 2);
 
   const filePath = await save({
@@ -1304,58 +928,6 @@ const exportJson = async () => {
 </script>
 
 <style scoped>
-.group {
-  @apply relative pl-5;
-}
-
-.group::before {
-  content: "";
-  height: calc(100% - 1.4rem * var(--guide-decrease) - 0.825rem);
-  @apply absolute top-0.5 left-2.5 border-l border-dotted border-gray-500;
-}
-
-.group-inside {
-  @apply relative;
-}
-
-.group-inside::before {
-  content: "";
-  @apply absolute top-[0.7rem] -left-[0.5625rem] w-2.5 border-t border-dotted border-gray-500;
-}
-
-.item-toplevel {
-  @apply relative pl-5;
-}
-
-.item-toplevel::before {
-  content: "";
-  @apply absolute top-1/2 left-[0.0625rem] w-2.5 border-t border-dotted border-gray-500;
-}
-
-.item-inside {
-  @apply relative pl-5;
-}
-
-.item-inside::before {
-  content: "";
-  @apply absolute top-1/2 -left-[0.5625rem] w-5 border-t border-dotted border-gray-500;
-}
-
-.right-arrow,
-.bottom-arrow {
-  @apply relative inline-block w-5 min-h-full;
-}
-
-.right-arrow::before {
-  content: "";
-  @apply absolute w-1.5 h-1.5 -mt-0.5 top-1/2 left-1.5 border-t-2 border-r-2 border-gray-500 rotate-45;
-}
-
-.bottom-arrow::before {
-  content: "";
-  @apply absolute w-1.5 h-1.5 -mt-[0.1875rem] top-1/2 left-[0.4375rem] border-r-2 border-b-2 border-gray-500 rotate-45;
-}
-
 .button-overrides {
   @apply px-0;
 }
